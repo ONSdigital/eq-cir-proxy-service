@@ -24,6 +24,7 @@ format:  ## Format the code.
 lint:  ## Run all linters (black/ruff/pylint/mypy).
 	poetry run black --check .
 	poetry run ruff check .
+	poetry run pylint --reports=n --output-format=colorized .
 	make mypy
 
 .PHONY: test
