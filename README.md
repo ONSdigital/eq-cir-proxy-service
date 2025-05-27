@@ -9,7 +9,8 @@
 [![poetry-managed](https://img.shields.io/badge/poetry-managed-blue)](https://python-poetry.org/)
 [![License - MIT](https://img.shields.io/badge/licence%20-MIT-1ac403.svg)](https://github.com/ONSdigital/eq-cir-proxy-service/blob/main/LICENSE)
 
-A service used by eQ Runner to request CIs from CIR, forward the CI schemas to the CIR Converter Service to convert them to the latest version, and return the updated schema back to eQ Runner
+A service used by eQ Runner to request CIs from CIR, forward the CI schemas to the CIR Converter Service to
+convert them to the latest version, and return the updated schema back to eQ Runner
 
 ---
 
