@@ -12,8 +12,6 @@ updates:
 
     directory: /
 
-    versioning-strategy: increase
-
     # Allows separate configs to be assigned for the same ecosystem
     target-branch: main
 
@@ -40,8 +38,6 @@ updates:
     open-pull-requests-limit: 10
 
     directory: /
-
-    versioning-strategy: increase
 
     schedule:
       interval: "monthly"
