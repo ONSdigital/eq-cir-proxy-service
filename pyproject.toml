@@ -13,13 +13,13 @@ python = "^3.12.6"
 [tool.poetry.group.dev.dependencies]
 # :TODO: Remove pylint when ruff supports all pylint rules
 # :TODO: Remove black when ruff supports all black rules
-pylint = "^3.3.1"
-black = "^24.10.0"
-pytest = "^8.3.3"
+pylint = "^3.3.7"
+black = "^25.1.0"
+pytest = "^8.3.5"
 pytest-xdist = "^3.6.1"
-ruff = "^0.7.1"
-pytest-cov = "^5.0.0"
-mypy = "^1.13.0"
+ruff = "^0.11.9"
+pytest-cov = "^6.1.1"
+mypy = "^1.15.0"
 
 [tool.black]
 line-length = 120
@@ -29,40 +29,58 @@ line-length = 120
 indent-width = 4
 
 [tool.ruff.lint]
-select = [
-    # Enabling ALL is not recommended it will implicitly enable new rules after upgrade.
-    # "ALL",
 
-    # Ruff rules: https://docs.astral.sh/ruff/rules/
-
-    "E",      # pycodestyle erros
-    "W",      # pycodestyle warnings
-    "F",      # Pyflakes
-    "UP",     # pyupgrade
-    "I",      # isort
-    "B",      # flake8-bugbear
+extend-select = [
+    "E4", "E7", "E9", "E5", # On top of the defaults (`E4`, E7`, `E9`, and `F`), enable E5 (Adds line length check - error "E501")
+    "Q",  # flake8-quotes (Q)
+    "B", # flake8-bugbear (B)
+    "A", # flake8-builtins (A)
+    "C4", # flake8-comprehensions (C4)
+    "PIE", # flake8-pie (PIE)
+    "SLF", # flake8-self (SLF)
+    "ARG", # flake8-unused-arguments (ARG)
+    "YTT", # flake8-2020 (YTT)
+    "C", # flake8-comprehensions (C)
+    "DTZ", # flake8-datetimez (DTZ)
+    "S", # flake8-bandit (S)
+    "TID", # flake8-tidy-imports (TID)
+    "ICN", # flake8-import-conventions (ICN)
+    "ISC", # flake8-implicit-str-concat (ISC)
+    "COM", # flake8-commas (COM)
+    "LOG", # flake8-logging (LOG)
+    "G", # flake8-logging-format (G)
+    "EM", # flake8-errmsg (EM)
+    "FBT", # flake8-boolean-trap (FBT)
+    "TD", # flake8-todo (TD)
+    "FA", # flake8-future-annotations (FA)
+    "T20", # flake8-print (T20)
+    "RET", # flake8-return (RET)
+    "E", # pycodestyle Error (E)
+    "W", # pycodestyle Warning (W)
+    "F", # pyflakes (F)
+    "I", # isort (I)
+    "N", # pep8-naming (N)
+    "RUF", # Ruff-specific rules (RUF)
+    "UP", # pyupgrade (UP)
+    "ERA", # eradicate (ERA)
+    "FURB", # refurb (FURB)
+    "TRY", # tryceratops (TRY)
+    "FLY", # flynt (FLY)
+    "PERF", # Perflint (PERF)
     "SIM",    # flake8-simplify
-    "C4",     # flake8-comprehensions
-    "S",      # flake8-bandit
     "D",      # pydocstyle - Enforce existing docstrings only
     "C90",    # mccabe
-    "RUF",    # Ruff specific rules
-
-    # PL - Pylint is only partially supported, we also use the pylint tool to catch all the rules.
-    # It is enabled here to take advantage of the ruff's speed.
-    "PL",
 ]
 
 ignore = [
-    # Conflicts with google docstring style
-    "D205",
     # Allow missing docstring, remove to enforce docstrings across the board
-    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107",
-    # Disable line length check as it is handled by black
-    # :TODO: Remove E501 when ruff supports all black rules
+    "D104",
+    # Remove E501 when ruff supports all black rules
     "E501",
-    # indentation contains tabs
-    "W191",
+    # Allow TODO comments without a listed author
+    "TD002",
+    # Allow TODO comments without a linked issue
+    "TD003",
 ]
 
 [tool.ruff.lint.pydocstyle]
