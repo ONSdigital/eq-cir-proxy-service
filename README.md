@@ -68,12 +68,6 @@ Ensure you have the following installed:
    make install
    ```
 
-3. Run the application
-
-   ```bash
-   make run
-   ```
-
 ## Development
 
 Get started with development by running the following commands.
