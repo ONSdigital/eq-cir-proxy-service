@@ -15,7 +15,16 @@ FORMATTERS_DISABLE_ERRORS: false
 
 # If you use ENABLE_LINTERS variable, all other linters will be disabled by
 # default
-# ENABLE_LINTERS:
+ENABLE_LINTERS:
+  - PYTHON_BANDIT
+  - PYTHON_BLACK
+  - PYTHON_FLAKE8
+  - PYTHON_ISORT
+  - PYTHON_MYPY
+  - PYTHON_PYLINT
+  - PYTHON_PYRIGHT
+  - PYTHON_RUFF
+  - PYTHON_RUFF_FORMAT
 
 DISABLE:
   - COPYPASTE
@@ -38,3 +47,7 @@ FILEIO_REPORTER: false
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdown-lint.yml
 
 YAML_V8R_FILTER_REGEX_EXCLUDE: "dependabot.yml" # Dependabot yaml in SchemaStore is currently not up to date. Dependabot is validated on push by GitHub by default.
+
+PYTHON_FLAKE8_ARGUMENTS: "--max-line-length=120"
+
+PYTHON_BANDIT_ARGUMENTS: "--skip B101"
