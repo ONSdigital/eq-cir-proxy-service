@@ -1,0 +1,109 @@
+[tool.poetry]
+name = "eq-cir-proxy-service"
+version = "0.1.0"
+description = "A service used by eQ Runner to request CIs from CIR, forward the CI schemas to the CIR Converter Service to convert them to the latest version, and return the updated schema back to eQ Runner"
+authors = ["ONSdigital"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12.6"
+
+[tool.poetry.group.dev.dependencies]
+# :TODO: Remove pylint when ruff supports all pylint rules
+# :TODO: Remove black when ruff supports all black rules
+pylint = "^3.3.7"
+black = "^25.1.0"
+pytest = "^8.3.5"
+pytest-xdist = "^3.6.1"
+ruff = "^0.11.9"
+pytest-cov = "^6.1.1"
+mypy = "^1.15.0"
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+
+extend-select = [
+    "E4", "E7", "E9", "E5", # On top of the defaults (`E4`, E7`, `E9`, and `F`), enable E5 (Adds line length check - error "E501")
+    "Q",  # flake8-quotes (Q)
+    "B", # flake8-bugbear (B)
+    "A", # flake8-builtins (A)
+    "C4", # flake8-comprehensions (C4)
+    "PIE", # flake8-pie (PIE)
+    "SLF", # flake8-self (SLF)
+    "ARG", # flake8-unused-arguments (ARG)
+    "YTT", # flake8-2020 (YTT)
+    "C", # flake8-comprehensions (C)
+    "DTZ", # flake8-datetimez (DTZ)
+    "S", # flake8-bandit (S)
+    "TID", # flake8-tidy-imports (TID)
+    "ICN", # flake8-import-conventions (ICN)
+    "ISC", # flake8-implicit-str-concat (ISC)
+    "COM", # flake8-commas (COM)
+    "LOG", # flake8-logging (LOG)
+    "G", # flake8-logging-format (G)
+    "EM", # flake8-errmsg (EM)
+    "FBT", # flake8-boolean-trap (FBT)
+    "TD", # flake8-todo (TD)
+    "FA", # flake8-future-annotations (FA)
+    "T20", # flake8-print (T20)
+    "RET", # flake8-return (RET)
+    "E", # pycodestyle Error (E)
+    "W", # pycodestyle Warning (W)
+    "F", # pyflakes (F)
+    "I", # isort (I)
+    "N", # pep8-naming (N)
+    "RUF", # Ruff-specific rules (RUF)
+    "UP", # pyupgrade (UP)
+    "ERA", # eradicate (ERA)
+    "FURB", # refurb (FURB)
+    "TRY", # tryceratops (TRY)
+    "FLY", # flynt (FLY)
+    "PERF", # Perflint (PERF)
+    "SIM",    # flake8-simplify
+    "D",      # pydocstyle - Enforce existing docstrings only
+    "C90",    # mccabe
+]
+
+ignore = [
+    # Allow missing docstring, remove to enforce docstrings across the board
+    "D104",
+    # Allow TODO comments without a listed author
+    "TD002",
+    # Allow TODO comments without a linked issue
+    "TD003",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    # Allow use of assert statements in tests
+    "S101",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+# Global mypy options
+no_implicit_optional = "True"
+ignore_missing_imports = "True"
+warn_unused_configs = "True"
+warn_no_return = "False"
+warn_unused_ignores = "True"
+warn_return_any = "True"
+warn_redundant_casts = "True"
+disallow_untyped_defs = "True"
+disallow_untyped_calls = "True"
+disallow_incomplete_defs = "True"
+strict_equality = "True"

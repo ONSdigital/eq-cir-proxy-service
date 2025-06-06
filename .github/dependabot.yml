@@ -1,0 +1,109 @@
+---
+# Config for Dependabot updates. See Documentation here:
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable security updates for GitHub Actions
+  - package-ecosystem: github-actions
+
+    # Applies an open pull request limit of 10 to overwrite the default value of 5
+    open-pull-requests-limit: 10
+
+    directory: /
+
+    # Allows separate configs to be assigned for the same ecosystem
+    target-branch: main
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/London"
+
+    labels:
+      - "dependencies"
+      - "github-actions-security"
+
+    groups:
+      # Group updates into fewer pull requests
+      gh-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: github-actions
+
+    open-pull-requests-limit: 10
+
+    directory: /
+
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/London"
+
+    labels:
+      - "dependencies"
+      - "github-actions-versions"
+
+    groups:
+      gh-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+
+  # Enable security updates for Python package manager
+  - package-ecosystem: pip
+
+    open-pull-requests-limit: 10
+
+    # Look for a pyproject.toml/requirements.txt/Pipfile.lock in the root directory
+    directory: /
+
+    versioning-strategy: increase
+
+    target-branch: main
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/London"
+
+    labels:
+      - "dependencies"
+      - "github-actions-security"
+
+    groups:
+      py-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Enable dependency updates for Python package manager
+  - package-ecosystem: pip
+
+    open-pull-requests-limit: 10
+
+    directory: /
+
+    versioning-strategy: increase
+
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/London"
+
+    labels:
+      - "dependencies"
+      - "github-actions-dependencies"
+
+    groups:
+      py-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
