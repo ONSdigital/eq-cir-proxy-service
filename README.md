@@ -37,9 +37,9 @@ To get a local copy up and running, follow these simple steps.
 Ensure you have the following installed:
 
 1. **Python**: Version specified in `.python-version`. We recommend using [pyenv](https://github.com/pyenv/pyenv) for
-   managing Python versions.
+    managing Python versions.
 2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual
-   environments.
+    environments.
 3. **[Docker](https://docs.docker.com/engine/install/)**
 4. **Operation System**: Ubuntu/MacOS
 
@@ -47,26 +47,26 @@ Ensure you have the following installed:
 
 1. Clone the repository and install the required dependencies.
 
-   ```bash
-   git clone https://github.com/ONSdigital/eq-cir-proxy-service.git
-   ```
+    ```bash
+    git clone https://github.com/ONSdigital/eq-cir-proxy-service.git
+    ```
 
 2. Install dependencies
 
-   [Poetry](https://python-poetry.org/) is used to manage dependencies in this project. For more information, read
-   the [Poetry documentation](https://python-poetry.org/).
+    [Poetry](https://python-poetry.org/) is used to manage dependencies in this project. For more information, read
+    the [Poetry documentation](https://python-poetry.org/).
 
-   To install all dependencies, including development dependencies, run:
+    To install all dependencies, including development dependencies, run:
 
-   ```bash
-   make install-dev
-   ```
+    ```bash
+    make install-dev
+    ```
 
-   To install only production dependencies, run:
+    To install only production dependencies, run:
 
-   ```bash
-   make install
-   ```
+    ```bash
+    make install
+    ```
 
 ## Development
 

@@ -11,31 +11,14 @@ FORMATTERS_DISABLE_ERRORS: false
 
 # If you use ENABLE variable, all other languages/formats/tooling-formats will
 # be disabled by default
-# ENABLE:
-
-# If you use ENABLE_LINTERS variable, all other linters will be disabled by
-# default
-ENABLE_LINTERS:
-  - PYTHON_BANDIT
-  - PYTHON_BLACK
-  - PYTHON_FLAKE8
-  - PYTHON_ISORT
-  - PYTHON_MYPY
-  - PYTHON_PYLINT
-  - PYTHON_PYRIGHT
-  - PYTHON_RUFF
-  - PYTHON_RUFF_FORMAT
-
-DISABLE:
+ENABLE:
   - COPYPASTE
-  - PYTHON
   - EDITORCONFIG
-  - SPELL
-
-DISABLE_LINTERS:
-  - REPOSITORY_DEVSKIM
-  - REPOSITORY_TRUFFLEHOG
-  - REPOSITORY_GIT_DIFF
+  - JSON
+  - MARKDOWN
+  - PYTHON
+  - REPOSITORY
+  - YAML
 
 SHOW_ELAPSED_TIME: true
 
@@ -46,7 +29,8 @@ FILEIO_REPORTER: false
 # Use yml file to allow the use of comments. Megalinter's default is .markdown-lint.json
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdown-lint.yml
 
-YAML_V8R_FILTER_REGEX_EXCLUDE: "dependabot.yml" # Dependabot yaml in SchemaStore is currently not up to date. Dependabot is validated on push by GitHub by default.
+# Dependabot yaml in SchemaStore is currently not up to date. Dependabot is validated on push by GitHub by default.
+YAML_V8R_FILTER_REGEX_EXCLUDE: "dependabot.yml"
 
 PYTHON_FLAKE8_ARGUMENTS: "--max-line-length=120"
 
