@@ -15,11 +15,11 @@ python = "^3.12.6"
 # :TODO: Remove black when ruff supports all black rules
 pylint = "^3.3.7"
 black = "^25.1.0"
-pytest = "^8.3.5"
+pytest = "^8.4.0"
 pytest-xdist = "^3.6.1"
-ruff = "^0.11.9"
+ruff = "^0.11.13"
 pytest-cov = "^6.1.1"
-mypy = "^1.15.0"
+mypy = "^1.16.0"
 
 [tool.black]
 line-length = 120
