@@ -3,6 +3,10 @@
 ---
 name: MegaLinter
 
+permissions:
+  contents: read
+  actions: read
+
 # Trigger mega-linter at every push. Action will also be visible from
 # Pull Requests to main
 on: # yamllint disable-line rule:truthy
