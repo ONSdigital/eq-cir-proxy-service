@@ -6,5 +6,6 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root():
+async def root() -> dict:
+    """Root endpoint returning JSON response."""
     return {"message": "Hello World"}
