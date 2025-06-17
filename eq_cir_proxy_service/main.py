@@ -1,3 +1,5 @@
+"""Entry point for the FastAPI application."""
+
 from fastapi import FastAPI
 
 app = FastAPI()
