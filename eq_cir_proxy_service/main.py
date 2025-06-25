@@ -1,6 +1,11 @@
-"""Sample function that adds two numbers, to prevent checks failing - to be deleted when code is implemented."""
+"""Entry point for the FastAPI application."""
+
+from fastapi import FastAPI
+
+app = FastAPI()
 
 
-def add_numbers(x: int, y: int) -> int:
-    """Function to add two numbers together."""
-    return x + y
+@app.get("/")
+async def root() -> dict:
+    """Root endpoint returning JSON response."""
+    return {"message": "Hello World"}

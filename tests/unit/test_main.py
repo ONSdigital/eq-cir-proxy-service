@@ -1,9 +1,14 @@
-"""Sample test to prevent checks failing - to be deleted when further tests are implemented."""
+"""Tests for the main application module."""
 
-from eq_cir_proxy_service.main import add_numbers
+from fastapi.testclient import TestClient
+
+from eq_cir_proxy_service.main import app
 
 
-def test_add_numbers():
-    """Tests that two numbers are added together correctly."""
-    expected_result = 5
-    assert add_numbers(2, 3) == expected_result
+def test_root():
+    """Tests the response JSON upon navigating to the root."""
+    client = TestClient(app)
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello World"}

@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := all
+LOG_LEVEL = INFO
 
 .PHONY: all
 all: ## Show the available make targets.
@@ -18,7 +19,12 @@ clean: ## Clean the temporary files.
 .PHONY: format
 format:  ## Format the code.
 	poetry run black .
-	poetry run ruff check . --fix
+	poetry run isort .
+
+.PHONY: run
+run: ## Start the local application
+	export LOG_LEVEL=${LOG_LEVEL} && \
+	poetry run uvicorn eq_cir_proxy_service.main:app --reload --port 5050
 
 .PHONY: lint
 lint:  ## Run all linters (black/ruff/pylint/mypy).
@@ -44,8 +50,8 @@ install-dev:  ## Install the dependencies including dev.
 	poetry install
 
 .PHONY: megalint
-megalint:  ## Run the mega-linter.
+megalint:  ## Run the MegaLinter.
 	docker run --platform linux/amd64 --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock:rw \
 		-v $(shell pwd):/tmp/lint:rw \
-		oxsecurity/megalinter-python:v8.7.0
+		oxsecurity/megalinter-python:v8.8.0
