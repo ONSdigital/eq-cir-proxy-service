@@ -24,13 +24,14 @@ convert them to the latest version, and return the updated schema back to eQ Run
 - [Development](#development)
     - [Run Tests with Coverage](#run-tests-with-coverage)
     - [Linting and Formatting](#linting-and-formatting)
+    - [View the local application](#view-the-local-application)
 - [Contributing](#contributing)
 - [License](#license)
 <!-- markdown-link-check-enable -->
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
+To run the project locally, follow these steps:
 
 ### Pre-requisites
 
@@ -68,6 +69,19 @@ Ensure you have the following installed:
     make install
     ```
 
+3. Set the environment variable LOG_LEVEL.
+    It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
+
+    ```bash
+    make set-env-var
+    ```
+
+4. Run the application
+
+    ```bash
+    make run
+    ```
+
 ## Development
 
 Get started with development by running the following commands.
@@ -90,7 +104,13 @@ make test
 
 ### Linting and Formatting
 
-Various tools are used to lint and format the code in this project.
+Various tools are used to lint and format the code in this project. These include:
+
+- Black
+- MegaLinter
+- Mypy
+- Pylint
+- Ruff
 
 #### Python
 
@@ -123,13 +143,20 @@ configured using the `.mega-linter.yml` file.
 To run MegaLinter, ensure you have **Docker** installed on your system.
 
 > Note: The initial run may take some time to download the Docker image. However, subsequent executions will be
-> considerably faster due to Docker caching. :rocket:
+> considerably faster due to Docker caching.
 
 To start the linter and automatically rectify fixable issues, run:
 
 ```bash
 make megalint
 ```
+
+### View the local application
+
+<!-- markdown-link-check-disable -->
+- Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
+- Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
+<!-- markdown-link-check-enable -->
 
 ## Contributing
 

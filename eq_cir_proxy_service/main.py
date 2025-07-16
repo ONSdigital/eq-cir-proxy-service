@@ -1,10 +1,11 @@
-"""This module is the entry point of the FastAPI application."""
+"""Entry point for the FastAPI application."""
 
-import fastapi
+from fastapi import FastAPI
 
-from eq_cir_proxy_service.routers import sample_router
+app = FastAPI()
 
-app = fastapi.FastAPI()
 
-app.include_router(sample_router.router)
-
+@app.get("/")
+async def root() -> dict:
+    """Root endpoint returning JSON response."""
+    return {"message": "Hello World"}
