@@ -49,3 +49,20 @@ megalint:  ## Run the mega-linter.
 		-v /var/run/docker.sock:/var/run/docker.sock:rw \
 		-v $(shell pwd):/tmp/lint:rw \
 		oxsecurity/megalinter-python:v8.7.0
+
+.PHONY: run
+run:  ## Start the local application.
+	export LOG_LEVEL=${LOG_LEVEL} && \
+	poetry run uvicorn eq_cir_proxy_service.main:app --reload --port 5050
+
+.PHONY: docker-build
+docker-build:  ## Build the docker image.
+	docker build -t cir-proxy-service .
+
+.PHONY: docker-run
+docker-run:  ## Run the docker container using the built image.
+	docker run -d -p 5050:5050 --name eq-cir-proxy-service cir-proxy-service
+
+.PHONY: docker-stop-remove
+docker-stop-remove:  ## Stop and remove the docker container.
+	docker stop eq-cir-proxy-service && docker rm eq-cir-proxy-service
