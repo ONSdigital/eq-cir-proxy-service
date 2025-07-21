@@ -12,6 +12,7 @@ python = "^3.12.6"
 fastapi = "^0.115.13"
 uvicorn = "^0.34.3"
 httpx = "^0.28.1"
+semver = "^3.0.4"
 
 [tool.poetry.group.dev.dependencies]
 # :TODO: Remove pylint when ruff supports all pylint rules
