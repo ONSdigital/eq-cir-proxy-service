@@ -9,24 +9,26 @@
 [![poetry-managed](https://img.shields.io/badge/poetry-managed-blue)](https://python-poetry.org/)
 [![License - MIT](https://img.shields.io/badge/licence%20-MIT-1ac403.svg)](https://github.com/ONSdigital/eq-cir-proxy-service/blob/main/LICENSE)
 
-A service used by eQ Runner to request CIs from CIR, forward the CI schemas to the CIR Converter Service to
-convert them to the latest version, and return the updated schema back to eQ Runner
+A service used by eQ Runner to request CIs from CIR, forward the Instruments to the CIR Converter Service to
+convert them to the latest version, and return the updated instrument back to eQ Runner
 
 ---
 
 ## Table of Contents
 
-[//]: # (:TODO: Enable link checking once https://github.com/tcort/markdown-link-check/issues/250 is resolved.)
+[//]: # ":TODO: Enable link checking once https://github.com/tcort/markdown-link-check/issues/250 is resolved."
+
 <!-- markdown-link-check-disable -->
-- [Getting Started](#getting-started)
-    - [Pre-requisites](#pre-requisites)
-    - [Installation](#installation)
-- [Development](#development)
-    - [Run Tests with Coverage](#run-tests-with-coverage)
-    - [Linting and Formatting](#linting-and-formatting)
-    - [View the local application](#view-the-local-application)
-- [Contributing](#contributing)
-- [License](#license)
+
+-   [Getting Started](#getting-started)
+    -   [Pre-requisites](#pre-requisites)
+    -   [Installation](#installation)
+-   [Development](#development)
+    -   [Run Tests with Coverage](#run-tests-with-coverage)
+    -   [Linting and Formatting](#linting-and-formatting)
+    -   [View the local application](#view-the-local-application)
+-   [Contributing](#contributing)
+-   [License](#license)
 <!-- markdown-link-check-enable -->
 
 ## Getting Started
@@ -38,9 +40,9 @@ To run the project locally, follow these steps:
 Ensure you have the following installed:
 
 1. **Python**: Version specified in `.python-version`. We recommend using [pyenv](https://github.com/pyenv/pyenv) for
-    managing Python versions.
+   managing Python versions.
 2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual
-    environments.
+   environments.
 3. **[Docker](https://docs.docker.com/engine/install/)**
 4. **Operation System**: Ubuntu/MacOS
 
@@ -70,7 +72,7 @@ Ensure you have the following installed:
     ```
 
 3. Set the environment variable LOG_LEVEL.
-    It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
+   It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
 
     ```bash
     make set-env-var
@@ -106,11 +108,11 @@ make test
 
 Various tools are used to lint and format the code in this project. These include:
 
-- Black
-- MegaLinter
-- Mypy
-- Pylint
-- Ruff
+-   Black
+-   MegaLinter
+-   Mypy
+-   Pylint
+-   Ruff
 
 #### Python
 
@@ -154,8 +156,9 @@ make megalint
 ### View the local application
 
 <!-- markdown-link-check-disable -->
-- Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
-- Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
+
+-   Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
+-   Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
 <!-- markdown-link-check-enable -->
 
 ## Contributing
