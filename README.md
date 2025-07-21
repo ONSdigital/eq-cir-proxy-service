@@ -20,15 +20,15 @@ convert them to the latest version, and return the updated instrument back to eQ
 
 <!-- markdown-link-check-disable -->
 
--   [Getting Started](#getting-started)
-    -   [Pre-requisites](#pre-requisites)
-    -   [Installation](#installation)
--   [Development](#development)
-    -   [Run Tests with Coverage](#run-tests-with-coverage)
-    -   [Linting and Formatting](#linting-and-formatting)
-    -   [View the local application](#view-the-local-application)
--   [Contributing](#contributing)
--   [License](#license)
+- [Getting Started](#getting-started)
+    - [Pre-requisites](#pre-requisites)
+    - [Installation](#installation)
+- [Development](#development)
+    - [Run Tests with Coverage](#run-tests-with-coverage)
+    - [Linting and Formatting](#linting-and-formatting)
+    - [View the local application](#view-the-local-application)
+- [Contributing](#contributing)
+- [License](#license)
 <!-- markdown-link-check-enable -->
 
 ## Getting Started
@@ -40,9 +40,8 @@ To run the project locally, follow these steps:
 Ensure you have the following installed:
 
 1. **Python**: Version specified in `.python-version`. We recommend using [pyenv](https://github.com/pyenv/pyenv) for
-   managing Python versions.
-2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual
-   environments.
+    managing Python versions.
+2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual environments.
 3. **[Docker](https://docs.docker.com/engine/install/)**
 4. **Operation System**: Ubuntu/MacOS
 
@@ -72,7 +71,8 @@ Ensure you have the following installed:
     ```
 
 3. Set the environment variable LOG_LEVEL.
-   It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
+
+    It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
 
     ```bash
     make set-env-var
@@ -108,11 +108,11 @@ make test
 
 Various tools are used to lint and format the code in this project. These include:
 
--   Black
--   MegaLinter
--   Mypy
--   Pylint
--   Ruff
+- Black
+- MegaLinter
+- Mypy
+- Pylint
+- Ruff
 
 #### Python
 
@@ -157,8 +157,8 @@ make megalint
 
 <!-- markdown-link-check-disable -->
 
--   Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
--   Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
+- Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
+- Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
 <!-- markdown-link-check-enable -->
 
 ## Contributing
