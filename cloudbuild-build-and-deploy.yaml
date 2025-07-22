@@ -1,0 +1,38 @@
+steps:
+  # Builds the Docker image
+  - name: docker
+    id: build_proxy_service_image
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        echo "*************************************************************"
+        echo "* Building Docker image for environment...                  *"
+        echo "*************************************************************"
+        docker build -t "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:${SHORT_SHA}" .
+
+  # Pushes the Docker image to Artifact Registry
+  - name: docker
+    id: push_proxy_service_image
+    entrypoint: "sh"
+    waitFor: build_proxy_service_image
+    args:
+      - "-c"
+      - |
+        echo "*************************************************************"
+        echo "* Pushing Docker image to Artifact Registry...              *"
+        echo "*************************************************************"
+        docker push "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:${SHORT_SHA}"
+
+  # Deploys the Docker image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: deploy_proxy_service
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        gcloud run deploy cir-proxy-service \
+        --image "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$SHORT_SHA" \
+        --region europe-west2 \
+        --platform managed
+timeout: 1800s

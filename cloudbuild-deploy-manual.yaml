@@ -1,0 +1,12 @@
+steps:
+  # Deploys the Docker image with the specified tag to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: deploy_proxy_service
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        gcloud run deploy cir-proxy-service \
+        --image "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$TAG_NAME" \
+        --region europe-west2 \
+        --platform managed
