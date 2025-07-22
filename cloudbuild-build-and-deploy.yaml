@@ -15,7 +15,8 @@ steps:
   - name: docker
     id: push_proxy_service_image
     entrypoint: "sh"
-    waitFor: build_proxy_service_image
+    waitFor:
+      - build_proxy_service_image
     args:
       - "-c"
       - |
