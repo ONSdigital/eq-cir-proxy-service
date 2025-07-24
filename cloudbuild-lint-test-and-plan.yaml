@@ -1,0 +1,38 @@
+steps:
+  # Lints the codebase
+  name: python:3.12.6
+  id: "lint_proxy_service"
+  entrypoint: "sh"
+  args:
+    - "-c"
+    - |
+      echo "*************************************************************"
+      echo "* Linting the codebase...                                   *"
+      echo "*************************************************************"
+      python -m pip install --user pipx
+      pipx install poetry
+      make lint
+      make megalint
+
+  # # Tests the codebase
+  # name: python:3.12.6
+  # id: "test_proxy_service"
+  # entrypoint: "sh"
+  # args:
+  #   - "-c"
+  #   - |
+  #     echo "*************************************************************"
+  #     echo "* Testing the codebase...                                   *"
+  #     echo "*************************************************************"
+  #     make test
+
+  # # Plans the Terraform configuration
+  # name: "hashicorp/terraform:latest"
+  # id: "plan_terraform_for_proxy_service"
+  # entrypoint: "sh"
+  # args:
+  #   - "-c"
+  #   - |
+  #     echo "*************************************************************"
+  #     echo "* Planning the Terraform configuration...                   *"
+  #     echo "*************************************************************"

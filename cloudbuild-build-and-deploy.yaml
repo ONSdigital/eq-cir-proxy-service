@@ -32,6 +32,9 @@ steps:
     args:
       - "-c"
       - |
+        echo "*************************************************************"
+        echo "* Deploying Docker image to Cloud Run...                    *"
+        echo "*************************************************************"
         gcloud run deploy cir-proxy-service \
         --image "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$SHORT_SHA" \
         --region europe-west2 \
