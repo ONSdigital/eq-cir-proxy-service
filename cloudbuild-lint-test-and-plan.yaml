@@ -6,11 +6,12 @@ steps:
     args:
       - "-c"
       - |
+        python -m pip install --user pipx
+        python -m pipx ensurepath
+        pipx install poetry
         echo "*************************************************************"
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
-        python -m pip install --user pipx
-        pipx install poetry
         make lint
         make megalint
 
