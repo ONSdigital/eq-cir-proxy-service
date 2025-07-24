@@ -13,6 +13,16 @@ steps:
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
         make lint
+
+  - name: docker
+    id: megalint_proxy_service
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        echo "*************************************************************"
+        echo "* Running Megalinter on the codebase...                     *"
+        echo "*************************************************************"
         make megalint
 
   # # Tests the codebase
