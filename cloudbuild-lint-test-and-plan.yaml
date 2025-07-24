@@ -8,6 +8,7 @@ steps:
       - |
         pip install --upgrade pip
         pip install poetry==2.1.2
+        poetry install
         echo "*************************************************************"
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
