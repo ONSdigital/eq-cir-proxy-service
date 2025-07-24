@@ -21,6 +21,9 @@ steps:
     args:
       - "-c"
       - |
+        pip install --upgrade pip
+        pip install poetry==2.1.2
+        make install-dev
         echo "*************************************************************"
         echo "* Testing the codebase...                                   *"
         echo "*************************************************************"
