@@ -13,7 +13,6 @@ steps:
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
         make lint
-        make test
 
   # Tests the codebase
   - name: python:3.12.6
