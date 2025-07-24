@@ -23,7 +23,10 @@ steps:
         echo "*************************************************************"
         echo "* Running Megalinter on the codebase...                     *"
         echo "*************************************************************"
-        make megalint
+        docker run --platform linux/amd64 --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock:rw \
+          -v $(shell pwd):/tmp/lint:rw \
+          oxsecurity/megalinter-python:v8.8.0
 
   # # Tests the codebase
   # name: python:3.12.6
