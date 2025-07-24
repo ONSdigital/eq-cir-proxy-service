@@ -13,6 +13,7 @@ steps:
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
         make lint
+        make test
 
   # Runs Megalinter on the codebase
   - name: docker
