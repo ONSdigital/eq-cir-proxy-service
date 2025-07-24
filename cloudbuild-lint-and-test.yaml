@@ -13,8 +13,6 @@ steps:
         echo "* Linting the codebase...                                   *"
         echo "*************************************************************"
         make lint
-    # Ensures the step is run immediately - allows other steps to run in parallel
-    waitFor: ["-"]
 
   # Tests the codebase
   - name: python:3.12.6
@@ -30,7 +28,6 @@ steps:
         echo "* Testing the codebase...                                   *"
         echo "*************************************************************"
         make test
-    waitFor: ["-"]
 
   # Runs Megalinter on the codebase
   - name: docker
@@ -46,7 +43,6 @@ steps:
           -v /var/run/docker.sock:/var/run/docker.sock:rw \
           -v $(pwd):/tmp/lint:rw \
           oxsecurity/megalinter-python:v8.8.0
-    waitFor: ["-"]
 
 timeout: 1800s
 options:
