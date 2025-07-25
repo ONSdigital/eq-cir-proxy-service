@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def validate_version(version: str) -> None:
-    """Checks if the version matches the regex pattern.
+    """Checks if the version is a valid semver.
 
     Parameters:
     - version: The version to validate.

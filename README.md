@@ -153,6 +153,10 @@ To start the linter and automatically rectify fixable issues, run:
 make megalint
 ```
 
+### Endpoint documentation
+
+- [Instrument endpoint](eq_cir_proxy_service/docs/endpoints/instrument/README.md)
+
 ### View the local application
 
 <!-- markdown-link-check-disable -->
