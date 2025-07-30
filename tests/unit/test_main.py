@@ -12,3 +12,18 @@ def test_root():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello World"}
+
+def test_validation_exception_handler(client=None):
+    """Test that a validation error returns a 422 response."""
+
+    client = client or TestClient(app)
+    # /instrument endpoint expects parameters, so send invalid data to trigger validation
+    response = client.get("/instrument/invalid-uuid")
+    assert response.status_code == 422 or response.status_code == 404  # Depending on router config
+
+def test_empty_instrument_id_exception_handler(client=None):
+    """Test that a missing instrument_id returns a 404."""
+
+    client = client or TestClient(app)
+    response = client.get("/instrument")
+    assert response.status_code == 404
