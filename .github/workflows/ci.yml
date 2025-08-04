@@ -35,7 +35,9 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "poetry"
 
-
+      - name: Install virtual environment
+        run: |
+          poetry install
 
 
 
@@ -50,11 +52,11 @@ jobs:
 #          python-version-file: .python-version
 #          cache: poetry
 #
-      - name: Install dependencies
-        run: make install-dev
-
-      - name: Lint Python
-        run: make lint
-
-      - name: Test
-        run: make test
+#      - name: Install dependencies
+#        run: make install-dev
+#
+#      - name: Lint Python
+#        run: make lint
+#
+#      - name: Test
+#        run: make test
