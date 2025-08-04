@@ -44,9 +44,9 @@ install:  ## Install the dependencies excluding dev.
 install-dev:  ## Install the dependencies including dev.
 	poetry env use 3.12.6
 	poetry env list
-	poetry install
 	pwd
 	cat poetry.lock
+	poetry install
 
 .PHONY: megalint
 megalint:  ## Run the MegaLinter.
