@@ -43,6 +43,7 @@ install:  ## Install the dependencies excluding dev.
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
 	poetry env use 3.12.6
+	poetry env list
 	poetry install
 
 .PHONY: megalint
