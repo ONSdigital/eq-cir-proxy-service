@@ -42,8 +42,7 @@ install:  ## Install the dependencies excluding dev.
 
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
-	poetry env info
-	poetry install --verbose
+	poetry install
 
 .PHONY: megalint
 megalint:  ## Run the MegaLinter.
