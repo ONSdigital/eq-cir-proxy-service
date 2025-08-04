@@ -42,6 +42,7 @@ install:  ## Install the dependencies excluding dev.
 
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
+	poetry run python --version
 	poetry install
 
 .PHONY: megalint
