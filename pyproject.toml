@@ -10,7 +10,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12.6"
 fastapi = "^0.116.1"
-uvicorn = "^0.34.3"
+uvicorn = "^0.35.0"
 httpx = "^0.28.1"
 semver = "^3.0.4"
 
@@ -19,11 +19,11 @@ semver = "^3.0.4"
 # :TODO: Remove black when ruff supports all black rules
 pylint = "^3.3.7"
 black = "^25.1.0"
-pytest = "^8.3.5"
-pytest-xdist = "^3.6.1"
-ruff = "^0.11.9"
-pytest-cov = "^6.1.1"
-mypy = "^1.15.0"
+pytest = "^8.4.1"
+pytest-xdist = "^3.8.0"
+ruff = "^0.12.7"
+pytest-cov = "^6.2.1"
+mypy = "^1.17.1"
 isort = "^6.0.1"
 
 [tool.black]
