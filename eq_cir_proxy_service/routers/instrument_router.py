@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Path, Query
 
 from eq_cir_proxy_service.config.logging_config import logging
-from eq_cir_proxy_service.exception import exception_messages
+from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.services.instrument import instrument_retrieval_service
 from eq_cir_proxy_service.services.validators.request_validator import (
     validate_version,

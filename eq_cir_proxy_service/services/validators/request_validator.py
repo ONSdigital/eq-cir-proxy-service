@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from semver import VersionInfo
 
 from eq_cir_proxy_service.config.logging_config import logging
-from eq_cir_proxy_service.exception import exception_messages
+from eq_cir_proxy_service.exceptions import exception_messages
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def validate_version(version: str) -> None:
     """Checks if the version is a valid semver.
 
-    Raises an HTTPException if the version is invalid (isvalid check returns False).
+    Raises an HTTPException if the version is invalid (is_valid check returns False).
 
     Parameters:
     - version: The version to validate.

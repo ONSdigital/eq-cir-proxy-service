@@ -19,7 +19,7 @@ def test_validation_exception_handler(client=None):
     client = client or TestClient(app)
     # /instrument endpoint expects parameters, so send invalid data to trigger validation
     response = client.get("/instrument/invalid-uuid")
-    assert response.status_code in (422, 404)
+    assert response.status_code == 422
 
 
 def test_empty_instrument_id_exception_handler(client=None):
