@@ -1,0 +1,23 @@
+steps:
+  # Tags the Docker image with the release tag
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: tag_proxy_service_release
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        gcloud container images add-tag \
+        $_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$SHORT_SHA \
+        $_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$TAG_NAME
+
+  # Deploys the Docker image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: deploy_proxy_service
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        gcloud run deploy cir-proxy-service \
+        --image "$_EQ_CIR_PROXY_SERVICE_IMAGE_REPO:$TAG_NAME" \
+        --region europe-west2 \
+        --platform managed
