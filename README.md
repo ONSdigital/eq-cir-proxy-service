@@ -9,15 +9,17 @@
 [![poetry-managed](https://img.shields.io/badge/poetry-managed-blue)](https://python-poetry.org/)
 [![License - MIT](https://img.shields.io/badge/licence%20-MIT-1ac403.svg)](https://github.com/ONSdigital/eq-cir-proxy-service/blob/main/LICENSE)
 
-A service used by eQ Runner to request CIs from CIR, forward the CI schemas to the CIR Converter Service to
-convert them to the latest version, and return the updated schema back to eQ Runner
+A service used by eQ Runner to request CIs from CIR, forward the instruments to the CIR Converter Service to
+convert them to the latest version, and return the updated instrument back to eQ Runner
 
 ---
 
 ## Table of Contents
 
-[//]: # (:TODO: Enable link checking once https://github.com/tcort/markdown-link-check/issues/250 is resolved.)
+[//]: # ":TODO: Enable link checking once https://github.com/tcort/markdown-link-check/issues/250 is resolved."
+
 <!-- markdown-link-check-disable -->
+
 - [Getting Started](#getting-started)
     - [Pre-requisites](#pre-requisites)
     - [Installation](#installation)
@@ -39,8 +41,7 @@ Ensure you have the following installed:
 
 1. **Python**: Version specified in `.python-version`. We recommend using [pyenv](https://github.com/pyenv/pyenv) for
     managing Python versions.
-2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual
-    environments.
+2. **[Poetry](https://python-poetry.org/)**: This is used to manage package dependencies and virtual environments.
 3. **[Docker](https://docs.docker.com/engine/install/)**
 4. **Operation System**: Ubuntu/MacOS
 
@@ -70,6 +71,7 @@ Ensure you have the following installed:
     ```
 
 3. Set the environment variable LOG_LEVEL.
+
     It can be set to INFO, DEBUG, WARN, ERROR - if not set, it will be set to INFO by default.
 
     ```bash
@@ -151,9 +153,14 @@ To start the linter and automatically rectify fixable issues, run:
 make megalint
 ```
 
+### Endpoint documentation
+
+- [Instrument endpoint](eq_cir_proxy_service/docs/endpoints/instrument/README.md)
+
 ### View the local application
 
 <!-- markdown-link-check-disable -->
+
 - Navigate to [http://localhost:5050/docs](http://localhost:5050/docs) to view the FastAPI application.
 - Navigate to [http://localhost:5050/](http://localhost:5050/) to view the response JSON.
 <!-- markdown-link-check-enable -->
