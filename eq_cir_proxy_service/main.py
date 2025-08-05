@@ -6,6 +6,10 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from eq_cir_proxy_service.config.logging_config import logging
+from eq_cir_proxy_service.exceptions.exception_messages import (
+    exception_404_missing_instrument_id,
+    exception_422_invalid_instrument_id,
+)
 from eq_cir_proxy_service.routers import instrument_router
 
 app = FastAPI()
@@ -24,7 +28,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     for error in exc.errors():
         loc = error.get("loc", [])
         if "path" in loc and "instrument_id" in loc:
-            logger.warning("Invalid UUID received for instrument_id: %s", request.path_params.get("instrument_id"))
+            invalid_instrument_id = request.path_params.get("instrument_id")
+            logger.warning(exception_422_invalid_instrument_id(invalid_instrument_id))
 
     logger.error("Validation error details: %s", exc.errors())
 
@@ -38,7 +43,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     """Custom exception handler for HTTP exceptions, to log /instrument 404 errors."""
     if exc.status_code == 404 and request.url.path.startswith("/instrument"):
-        logger.error("404 - instrument_id not provided or route not found: %s", request.url.path)
+        logger.error(exception_404_missing_instrument_id(request.url.path))
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail},

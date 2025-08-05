@@ -19,7 +19,7 @@ retrieved instrument, the instrument is updated via the Converter Service API.
 
 ### 200
 
-Success. A json return of the matched (and converted) instrument.
+Success. A JSON return of the matched (and converted) instrument.
 
 ### 400
 

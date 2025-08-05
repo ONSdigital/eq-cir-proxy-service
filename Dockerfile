@@ -4,7 +4,7 @@ WORKDIR /eq_cir_proxy_service
 
 COPY pyproject.toml poetry.lock /eq_cir_proxy_service/
 
-RUN pip install --no-cache-dir poetry==1.8.4 && \
+RUN pip install --no-cache-dir poetry==2.1.2 && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --with dev
 

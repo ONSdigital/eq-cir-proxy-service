@@ -16,7 +16,7 @@ from eq_cir_proxy_service.config import logging_config
     ],
 )
 def test_get_log_level(env_value, expected_level):
-    """Test that the logging level is set correctly based on the LOG_LEVEL environment variable."""
+    """Should correctly set the logging level based on the LOG_LEVEL environment variable."""
     os.environ["LOG_LEVEL"] = env_value
     log_level = logging_config.get_log_level()
     assert log_level == expected_level
