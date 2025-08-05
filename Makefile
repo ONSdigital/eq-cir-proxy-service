@@ -55,3 +55,15 @@ megalint:  ## Run the MegaLinter.
 		-v /var/run/docker.sock:/var/run/docker.sock:rw \
 		-v $(shell pwd):/tmp/lint:rw \
 		oxsecurity/megalinter-python:v8.8.0
+
+.PHONY: docker-build
+docker-build:  ## Build the docker image.
+	docker build -t cir-proxy-service .
+
+.PHONY: docker-run
+docker-run:  ## Run the docker container using the built image.
+	docker run -d -p 5050:5050 --name eq-cir-proxy-service cir-proxy-service
+
+.PHONY: docker-stop-remove
+docker-stop-remove:  ## Stop and remove the docker container.
+	docker stop eq-cir-proxy-service && docker rm eq-cir-proxy-service
