@@ -32,7 +32,7 @@ async def get_instrument_by_uuid(
             logger.info("Validating the version...")
             validate_version(version)
 
-        return await instrument_retrieval_service.retrieve_instrument(instrument_id, version)
+        return instrument_retrieval_service.retrieve_instrument(instrument_id)
 
     except HTTPException:
         raise  # re-raise so FastAPI handles it properly

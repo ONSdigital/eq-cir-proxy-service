@@ -13,6 +13,10 @@ fastapi = "^0.116.1"
 uvicorn = "^0.34.3"
 httpx = "^0.28.1"
 semver = "^3.0.4"
+requests = "^2.32.4"
+python-dotenv = "^1.1.1"
+types-requests = "^2.32.4.20250809"
+pytest-mock = "^3.14.1"
 
 [tool.poetry.group.dev.dependencies]
 # :TODO: Remove pylint when ruff supports all pylint rules
