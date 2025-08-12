@@ -3,7 +3,7 @@
 import os
 from uuid import UUID
 
-import requests
+import httpx
 from fastapi import HTTPException
 
 from eq_cir_proxy_service.config.logging_config import logging
@@ -16,7 +16,7 @@ from eq_cir_proxy_service.types.custom_types import Instrument
 logger = logging.getLogger(__name__)
 
 
-def retrieve_instrument(instrument_id: UUID) -> Instrument:
+async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     """Retrieves the instrument from CIR.
 
     Parameters:
@@ -32,8 +32,9 @@ def retrieve_instrument(instrument_id: UUID) -> Instrument:
     cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT")
     url = f"{cir_base_url}{cir_endpoint}"
     try:
-        response = requests.get(url, params={"guid": str(instrument_id)}, timeout=10)
-    except requests.RequestException as e:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(url, params={"guid": str(instrument_id)})
+    except httpx.RequestError as e:
         logger.exception("Error occurred while retrieving instrument: %s")
         raise HTTPException(
             status_code=500,

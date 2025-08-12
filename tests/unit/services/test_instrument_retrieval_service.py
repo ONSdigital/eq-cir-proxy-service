@@ -3,8 +3,8 @@
 import os
 from uuid import uuid4
 
+import httpx
 import pytest
-import requests
 from fastapi import HTTPException
 
 from eq_cir_proxy_service.services.instrument.instrument_retrieval_service import (
@@ -12,6 +12,7 @@ from eq_cir_proxy_service.services.instrument.instrument_retrieval_service impor
 )
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "status_code, json_data, text_data, side_effect, expected_result, expected_exception",
     [
@@ -22,10 +23,10 @@ from eq_cir_proxy_service.services.instrument.instrument_retrieval_service impor
         # 500 Server Error case
         (500, None, "Internal Server Error", None, None, HTTPException),
         # Connection/Timeout error case
-        (None, None, None, requests.RequestException("Timeout"), None, HTTPException),
+        (None, None, None, httpx.RequestError("Timeout"), None, HTTPException),
     ],
 )
-def test_retrieve_instrument(
+async def test_retrieve_instrument(
     status_code,
     json_data,
     text_data,
@@ -49,23 +50,23 @@ def test_retrieve_instrument(
         mock_response.text = text_data
         if json_data is not None:
             mock_response.json.return_value = json_data
-        mock_get_return = mock_response
+        async_mock_get = mocker.AsyncMock(return_value=mock_response)
     else:
-        mock_get_return = side_effect
+        async_mock_get = mocker.AsyncMock(side_effect=side_effect)
 
-    # Patch requests.get
+    # Patch httpx.get
     mock_get = mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.requests.get",
-        side_effect=[mock_get_return],
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.httpx.AsyncClient.get",
+        async_mock_get,
     )
 
     if expected_exception:
         with pytest.raises(expected_exception) as exc_info:
-            retrieve_instrument(instrument_id)
+            await retrieve_instrument(instrument_id)
         assert exc_info.value.status_code == (status_code if status_code is not None else 500)
     else:
-        result = retrieve_instrument(instrument_id)
+        result = await retrieve_instrument(instrument_id)
         assert result == expected_result
 
     # Only assert call if not simulating an exception before call
-    mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)}, timeout=10)
+    mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)})

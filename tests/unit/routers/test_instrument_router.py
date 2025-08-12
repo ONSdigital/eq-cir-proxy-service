@@ -15,7 +15,8 @@ app.include_router(router)
 client = TestClient(app)
 
 
-def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
+@pytest.mark.asyncio
+async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
     """Should return 200 and correct instrument data when given a valid UUID."""
     instrument_id = uuid4()
     mocked_instrument = {
@@ -23,7 +24,7 @@ def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
         "validator_version": "1.0.0",
     }
 
-    def mock_retrieve_instrument(_instrument_id):
+    async def mock_retrieve_instrument(_instrument_id):
         return mocked_instrument
 
     monkeypatch.setattr(
@@ -38,7 +39,8 @@ def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
     assert data["validator_version"] == "1.0.0"
 
 
-def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPatch):
+@pytest.mark.asyncio
+async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPatch):
     """Should return 200 and correct instrument data when version is supplied."""
     instrument_id = uuid4()
     version = "2.0.0"
@@ -47,7 +49,7 @@ def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPatch):
         "validator_version": "1.0.0",
     }
 
-    def mock_retrieve_instrument(_instrument_id):
+    async def mock_retrieve_instrument(_instrument_id):
         return mocked_instrument
 
     monkeypatch.setattr(
