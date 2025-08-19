@@ -10,6 +10,10 @@ EXCEPTION_400_INVALID_VERSION = (
 
 EXCEPTION_404_INSTRUMENT_NOT_FOUND = "Instrument not found for the provided instrument_id"
 
+EXCEPTION_400_INVALID_CONVERSION = "Target version is lower than instrument version"
+
+EXCEPTION_400_INVALID_INSTRUMENT = "Received instrument is not valid."
+
 
 def exception_404_missing_instrument_id(path: str) -> str:
     """Returns the exception message for a missing instrument_id."""
