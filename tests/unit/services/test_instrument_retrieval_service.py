@@ -56,7 +56,7 @@ async def test_retrieve_instrument(
 
     # Patch httpx.get
     mock_get = mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.httpx.AsyncClient.get",
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.AsyncClient.get",
         async_mock_get,
     )
 
