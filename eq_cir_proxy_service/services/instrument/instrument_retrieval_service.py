@@ -31,7 +31,7 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     cir_base_url = os.getenv("CIR_API_BASE_URL")
     cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT", "/v2/retrieve_collection_instrument")
 
-    if cir_base_url is None:
+    if cir_base_url is None or cir_base_url == "":
         logger.error("CIR_API_BASE_URL is not configured.")
         raise HTTPException(
             status_code=500,
@@ -40,7 +40,7 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
                 "message": "CIR_API_BASE_URL configuration is missing.",
             },
         )
-    if cir_endpoint is None:
+    if cir_endpoint is None or cir_endpoint == "":
         logger.error("CIR_RETRIEVE_CI_ENDPOINT is not configured.")
         raise HTTPException(
             status_code=500,
