@@ -14,7 +14,7 @@ from eq_cir_proxy_service.exceptions.exception_messages import (
 from eq_cir_proxy_service.routers import instrument_router
 
 # Load .env file
-load_dotenv()
+load_dotenv(".env")
 
 app = FastAPI()
 logger = logging.getLogger(__name__)

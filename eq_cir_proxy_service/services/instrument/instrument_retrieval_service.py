@@ -29,10 +29,30 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     logger.info("Retrieving instrument %s from CIR...", instrument_id)
 
     cir_base_url = os.getenv("CIR_API_BASE_URL")
-    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT")
+    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT", "/v2/retrieve_collection_instrument")
+
+    if cir_base_url is None:
+        logger.error("CIR_API_BASE_URL is not configured.")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": "CIR_API_BASE_URL configuration is missing.",
+            },
+        )
+    if cir_endpoint is None:
+        logger.error("CIR_RETRIEVE_CI_ENDPOINT is not configured.")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": "CIR_RETRIEVE_CI_ENDPOINT configuration is missing.",
+            },
+        )
+
     url = f"{cir_base_url}{cir_endpoint}"
     try:
-        async with AsyncClient(timeout=10) as client:
+        async with AsyncClient() as client:
             response = await client.get(url, params={"guid": str(instrument_id)})
     except RequestError as e:
         logger.exception("Error occurred while retrieving instrument: %s")
