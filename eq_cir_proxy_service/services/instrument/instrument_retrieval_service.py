@@ -21,10 +21,9 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
 
     Parameters:
     - instrument_id: The ID of the instrument.
-    - target_version: The target version of the instrument.
 
     Returns:
-    - dict: The retrieved instrument.
+    - Instrument: The retrieved instrument.
     """
     logger.info("Retrieving instrument %s from CIR...", instrument_id)
 
