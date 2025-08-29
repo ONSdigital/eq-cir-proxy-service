@@ -14,29 +14,51 @@ from eq_cir_proxy_service.services.instrument.instrument_retrieval_service impor
 
 
 @pytest.mark.asyncio
+async def test_retrieve_instrument_success(mocker):
+    """Test the retrieve_instrument function is successful."""
+    instrument_id = uuid4()
+
+    # Set up fake environment variables
+    base_url = "http://fake-base-url/"
+    endpoint = "fake-endpoint"
+    mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint})
+
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"id": "123"}
+    async_mock_get = mocker.AsyncMock(return_value=mock_response)
+
+    # Patch httpx.get
+    mock_get = mocker.patch(
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.AsyncClient.get",
+        async_mock_get,
+    )
+
+    result = await retrieve_instrument(instrument_id)
+    assert result == {"id": "123"}
+
+    mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)})
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "status_code, json_data, text_data, side_effect, expected_result, expected_exception",
+    "status_code, text_data, side_effect",
     [
-        # 200 OK case
-        (200, {"id": "123"}, "", None, {"id": "123"}, None),
         # 404 Not Found case
-        (404, None, "Not Found", None, None, HTTPException),
+        (404, "Not Found", None),
         # 500 Server Error case
-        (500, None, "Internal Server Error", None, None, HTTPException),
+        (500, "Internal Server Error", None),
         # Connection/Timeout error case
-        (None, None, None, httpx.RequestError("Timeout"), None, HTTPException),
+        (None, None, httpx.RequestError("Timeout")),
     ],
 )
-async def test_retrieve_instrument(
+async def test_retrieve_instrument_exception(
     status_code,
-    json_data,
     text_data,
     side_effect,
-    expected_result,
-    expected_exception,
     mocker,
 ):
-    """Test the retrieve_instrument function with various scenarios."""
+    """Test the retrieve_instrument function with various exception scenarios."""
     instrument_id = uuid4()
 
     # Set up fake environment variables
@@ -49,8 +71,6 @@ async def test_retrieve_instrument(
         mock_response = mocker.Mock()
         mock_response.status_code = status_code
         mock_response.text = text_data
-        if json_data is not None:
-            mock_response.json.return_value = json_data
         async_mock_get = mocker.AsyncMock(return_value=mock_response)
     else:
         async_mock_get = mocker.AsyncMock(side_effect=side_effect)
@@ -61,13 +81,9 @@ async def test_retrieve_instrument(
         async_mock_get,
     )
 
-    if expected_exception:
-        with pytest.raises(expected_exception) as exc_info:
-            await retrieve_instrument(instrument_id)
-        assert exc_info.value.status_code == (status_code if status_code is not None else 500)
-    else:
-        result = await retrieve_instrument(instrument_id)
-        assert result == expected_result
+    with pytest.raises(HTTPException) as exc_info:
+        await retrieve_instrument(instrument_id)
+    assert exc_info.value.status_code == (status_code if status_code is not None else 500)
 
     # Only assert call if not simulating an exception before call
     mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)})
