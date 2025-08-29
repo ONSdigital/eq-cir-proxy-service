@@ -1,5 +1,4 @@
 .DEFAULT_GOAL := all
-LOG_LEVEL = INFO
 
 .PHONY: all
 all: ## Show the available make targets.
@@ -23,8 +22,7 @@ format:  ## Format the code.
 
 .PHONY: run
 run: ## Start the local application
-	export LOG_LEVEL=${LOG_LEVEL} && \
-	poetry run uvicorn eq_cir_proxy_service.main:app --reload --port 5050
+	poetry run dotenv run -- uvicorn eq_cir_proxy_service.main:app --reload --port 5050
 
 .PHONY: lint
 lint:  ## Run all linters (black/ruff/pylint/mypy).

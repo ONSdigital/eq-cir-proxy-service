@@ -1,5 +1,6 @@
 """Entry point for the FastAPI application."""
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -11,6 +12,9 @@ from eq_cir_proxy_service.exceptions.exception_messages import (
     exception_422_invalid_instrument_id,
 )
 from eq_cir_proxy_service.routers import instrument_router
+
+# Load .env file
+load_dotenv(".env")
 
 app = FastAPI()
 logger = logging.getLogger(__name__)

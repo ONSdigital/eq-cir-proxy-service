@@ -13,6 +13,9 @@ fastapi = "^0.116.1"
 uvicorn = "^0.34.3"
 httpx = "^0.28.1"
 semver = "^3.0.4"
+python-dotenv = "^1.1.1"
+pytest-mock = "^3.14.1"
+pytest-asyncio = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 # :TODO: Remove pylint when ruff supports all pylint rules
@@ -33,8 +36,10 @@ line-length = 120
 line-length = 120
 indent-width = 4
 
-[tool.ruff.lint]
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
 
+[tool.ruff.lint]
 extend-select = [
     "E4", "E7", "E9", "E5", # On top of the defaults (`E4`, E7`, `E9`, and `F`), enable E5 (Adds line length check - error "E501")
     "Q",  # flake8-quotes (Q)
