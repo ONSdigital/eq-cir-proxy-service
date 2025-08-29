@@ -17,10 +17,9 @@ client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
-    """Should return 200 and correct instrument data when given a valid UUID."""
+    """Should return 422 error when version is not provided."""
     instrument_id = uuid4()
     mocked_instrument = {
-        "id": str(instrument_id),
         "validator_version": "1.0.0",
     }
 
@@ -33,35 +32,42 @@ async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
     )
 
     response = client.get(f"/instrument/{instrument_id}")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == str(instrument_id)
-    assert data["validator_version"] == "1.0.0"
+    assert response.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPatch):
-    """Should return 200 and correct instrument data when version is supplied."""
+    """Should return 200 and correct instrument data when version is supplied, including conversion."""
     instrument_id = uuid4()
     version = "2.0.0"
     mocked_instrument = {
-        "id": str(instrument_id),
         "validator_version": "1.0.0",
+    }
+    converted_instrument = {
+        "validator_version": version,
     }
 
     async def mock_retrieve_instrument(_instrument_id):
         return mocked_instrument
 
+    async def mock_convert_instrument(instrument, target_version):
+        assert instrument == mocked_instrument
+        assert target_version == version
+        return converted_instrument
+
     monkeypatch.setattr(
         "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.retrieve_instrument",
         mock_retrieve_instrument,
+    )
+    monkeypatch.setattr(
+        "eq_cir_proxy_service.services.instrument.instrument_conversion_service.convert_instrument",
+        mock_convert_instrument,
     )
 
     response = client.get(f"/instrument/{instrument_id}?version={version}")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == str(instrument_id)
-    assert data["validator_version"] == "1.0.0"
+    assert data["validator_version"] == version
 
 
 def test_get_instrument_by_uuid_invalid_uuid() -> None:
