@@ -41,7 +41,27 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
         logger.info("Requesting conversion for instrument from %s to %s...", current_version, target_version)
 
         converter_service_base_url = os.getenv("CONVERTER_SERVICE_API_BASE_URL")
-        converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT")
+        converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
+
+        if not converter_service_base_url:
+            logger.error("CONVERTER_SERVICE_API_BASE_URL is not configured.")
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": "CONVERTER_SERVICE_API_BASE_URL configuration is missing.",
+                },
+            )
+        if not converter_service_endpoint:
+            logger.error("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT is not configured.")
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing.",
+                },
+            )
+
         url = f"{converter_service_base_url}{converter_service_endpoint}"
         try:
             async with AsyncClient(timeout=10) as client:
