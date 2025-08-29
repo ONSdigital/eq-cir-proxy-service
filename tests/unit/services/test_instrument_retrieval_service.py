@@ -74,11 +74,20 @@ async def test_retrieve_instrument(
 
 
 @pytest.mark.asyncio
-async def test_retrieve_instrument_missing_cir_base_url(mocker):
-    """Test retrieve_instrument raises HTTPException if CIR_API_BASE_URL is missing."""
+@pytest.mark.parametrize(
+    "environment_variables",
+    [
+        # No URL
+        ({}),
+        # Empty URL
+        ({"CIR_API_BASE_URL": ""}),
+    ],
+)
+async def test_retrieve_instrument_missing_cir_base_url(environment_variables, mocker):
+    """Test retrieve_instrument raises HTTPException if CIR_API_BASE_URL is missing or empty."""
     instrument_id = uuid4()
     # Patch environment to remove CIR_API_BASE_URL
-    mocker.patch.dict(os.environ, {}, clear=True)
+    mocker.patch.dict(os.environ, environment_variables, clear=True)
     with pytest.raises(HTTPException) as exc_info:
         await instrument_retrieval_service.retrieve_instrument(instrument_id)
     exc = exc_info.value
@@ -88,15 +97,10 @@ async def test_retrieve_instrument_missing_cir_base_url(mocker):
 
 @pytest.mark.asyncio
 async def test_retrieve_instrument_missing_cir_endpoint(mocker):
-    """Test retrieve_instrument raises HTTPException if CIR_RETRIEVE_CI_ENDPOINT is missing."""
+    """Test retrieve_instrument raises HTTPException if CIR_RETRIEVE_CI_ENDPOINT exists but has no value."""
     instrument_id = uuid4()
     # Patch environment to include CIR_API_BASE_URL but not CIR_RETRIEVE_CI_ENDPOINT
-    mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": "http://fake-url"}, clear=True)
-    # Patch os.getenv to return None for CIR_RETRIEVE_CI_ENDPOINT
-    mocker.patch(
-        "os.getenv",
-        side_effect=lambda k, d=None: None if k == "CIR_RETRIEVE_CI_ENDPOINT" else os.environ.get(k, d),
-    )
+    mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": "http://fake-url", "CIR_RETRIEVE_CI_ENDPOINT": ""}, clear=True)
     with pytest.raises(HTTPException) as exc_info:
         await instrument_retrieval_service.retrieve_instrument(instrument_id)
     exc = exc_info.value
