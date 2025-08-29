@@ -23,9 +23,9 @@ INSTRUMENT_ID_PATH = Path(..., description="UUIDv4 of the instrument")
 @router.get("/instrument/{instrument_id}")
 async def get_instrument_by_uuid(
     instrument_id: UUID = INSTRUMENT_ID_PATH,
-    version: str = Query(description="Optional version of the instrument"),
+    version: str = Query(description="Validator version of the instrument required"),
 ) -> Instrument:
-    """Retrieve an instrument by its UUID and optional version."""
+    """Retrieve an instrument by its UUID and version."""
     logger.info("Receiving the instrument id...")
     logger.debug("Received instrument id: %s", instrument_id)
 
