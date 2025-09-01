@@ -1,12 +1,16 @@
 """Entry point for the FastAPI application."""
 
+import logging
+import os
+import sys
+
+import structlog
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from eq_cir_proxy_service.config.logging_config import logging
 from eq_cir_proxy_service.exceptions.exception_messages import (
     exception_404_missing_instrument_id,
     exception_422_invalid_instrument_id,
@@ -16,8 +20,31 @@ from eq_cir_proxy_service.routers import instrument_router
 # Load .env file
 load_dotenv(".env")
 
+LOG_LEVEL = logging.DEBUG if os.getenv("LOG_LEVEL") == "DEBUG" else logging.INFO
+
+error_log_handler = logging.StreamHandler(sys.stderr)
+error_log_handler.setLevel(logging.ERROR)
+
+
+renderer_processor = (
+    structlog.dev.ConsoleRenderer() if LOG_LEVEL == logging.DEBUG else structlog.processors.JSONRenderer()
+)
+
+logging.basicConfig(level=LOG_LEVEL, format="%(message)s", stream=sys.stdout)
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        renderer_processor,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+)
+
 app = FastAPI()
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()
 
 
 @app.get("/")

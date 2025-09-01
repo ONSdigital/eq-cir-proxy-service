@@ -5,12 +5,29 @@ import os
 from fastapi import HTTPException, status
 from httpx import AsyncClient, RequestError
 from semver import Version
+from structlog import get_logger
 
-from eq_cir_proxy_service.config.logging_config import logging
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.types.custom_types import Instrument
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
+
+
+def safe_parse(label: str, version: str) -> Version:
+    """Safely parses a version string into a Version object."""
+    try:
+        return Version.parse(version)
+    except ValueError as e:
+        # Logs full traceback with context
+        logger.exception("Error parsing %s version (%s)", label, version)
+        # Client sees only this clean message
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "status": "error",
+                "message": f"Invalid {label} version: {version}",
+            },
+        ) from e
 
 
 async def convert_instrument(instrument: Instrument, target_version: str) -> Instrument:
@@ -31,9 +48,9 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
         )
 
-    current_version: str = str(instrument["validator_version"])
-    parsed_current_version = Version.parse(current_version)
-    parsed_target_version = Version.parse(target_version)
+    current_version = str(instrument["validator_version"])
+    parsed_current_version = safe_parse("current", current_version)
+    parsed_target_version = safe_parse("target", target_version)
 
     if parsed_current_version < parsed_target_version:
         logger.info("Instrument requires updating")

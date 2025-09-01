@@ -5,15 +5,15 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from httpx import AsyncClient, RequestError
+from structlog import get_logger
 
-from eq_cir_proxy_service.config.logging_config import logging
 from eq_cir_proxy_service.exceptions.exception_messages import (
     EXCEPTION_404_INSTRUMENT_NOT_FOUND,
     EXCEPTION_500_INSTRUMENT_PROCESSING,
 )
 from eq_cir_proxy_service.types.custom_types import Instrument
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 async def retrieve_instrument(instrument_id: UUID) -> Instrument:

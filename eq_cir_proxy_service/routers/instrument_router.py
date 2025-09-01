@@ -3,8 +3,8 @@
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path, Query
+from structlog import get_logger
 
-from eq_cir_proxy_service.config.logging_config import logging
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.services.instrument import (
     instrument_conversion_service,
@@ -16,7 +16,7 @@ from eq_cir_proxy_service.services.validators.request_validator import (
 from eq_cir_proxy_service.types.custom_types import Instrument
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
+logger = get_logger()
 INSTRUMENT_ID_PATH = Path(..., description="UUIDv4 of the instrument")
 
 

@@ -9,6 +9,7 @@ from httpx import AsyncClient, RequestError
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.services.instrument.instrument_conversion_service import (
     convert_instrument,
+    safe_parse,
 )
 
 
@@ -133,3 +134,73 @@ async def test_retrieve_instrument_missing_converter_endpoint(mocker):
     exc = exc_info.value
     assert exc.status_code == 500
     assert exc.detail["message"] == "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing."
+
+
+def test_safe_parse_valid(monkeypatch):
+    """Tests the safe_parse function with a valid version."""
+
+    class DummyVersion:  # pylint: disable=too-few-public-methods
+        """Dummy version parser for testing."""
+
+        @staticmethod
+        def parse(s: str):
+            """Parses a version string."""
+            return f"parsed-{s}"
+
+    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion_service.Version", DummyVersion)
+
+    result = safe_parse("current", "1.2.3")
+    assert result == "parsed-1.2.3"
+
+
+def test_safe_parse_invalid_current(monkeypatch):
+    """Tests the safe_parse function with an invalid current version."""
+
+    class DummyVersion:  # pylint: disable=too-few-public-methods
+        """Dummy version parser for testing."""
+
+        @staticmethod
+        def parse(s: str):
+            """Parses a version string."""
+            error_message = "bad version"
+            if s == "good":
+                return "parsed-good"
+            raise ValueError(error_message)
+
+    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion_service.Version", DummyVersion)
+
+    with pytest.raises(HTTPException) as exc_info:
+        safe_parse("current", "abc")
+
+    exc = exc_info.value
+    assert exc.status_code == 400
+    assert exc.detail["status"] == "error"
+    assert exc.detail["message"] == "Invalid current version: abc"
+
+
+def test_safe_parse_invalid_target(monkeypatch):
+    """Tests the safe_parse function with an invalid target version."""
+
+    class DummyVersion:  # pylint: disable=too-few-public-methods
+        """Dummy version parser for testing."""
+
+        @staticmethod
+        def parse(s: str):
+            """Parses a version string."""
+            error_message = "bad version"
+            if s == "good":
+                return "parsed-good"
+            raise ValueError(error_message)
+
+    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion_service.Version", DummyVersion)
+
+    # good current
+    assert safe_parse("current", "good") == "parsed-good"
+
+    # bad target
+    with pytest.raises(HTTPException) as exc_info:
+        safe_parse("target", "???")
+
+    exc = exc_info.value
+    assert exc.status_code == 400
+    assert exc.detail["message"] == "Invalid target version: ???"
