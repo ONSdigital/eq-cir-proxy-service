@@ -62,7 +62,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             invalid_instrument_id = request.path_params.get("instrument_id")
             logger.warning(exception_422_invalid_instrument_id(invalid_instrument_id))
 
-    logger.error("Validation error details: %s", exc.errors())
+    logger.error("Validation error details: ", error=exc.errors())
 
     return JSONResponse(
         status_code=422,

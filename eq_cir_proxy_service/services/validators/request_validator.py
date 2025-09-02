@@ -20,7 +20,7 @@ def validate_version(version: str) -> None:
     - version: The version to validate.
     """
     if not VersionInfo.is_valid(version):
-        logger.exception("Invalid version: %s", version)
+        logger.exception("Invalid version: ", version=version)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_VERSION},

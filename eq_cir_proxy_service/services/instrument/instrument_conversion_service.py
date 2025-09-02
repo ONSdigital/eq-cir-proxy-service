@@ -13,19 +13,19 @@ from eq_cir_proxy_service.types.custom_types import Instrument
 logger = get_logger()
 
 
-def safe_parse(label: str, version: str) -> Version:
+def safe_parse(source: str, version: str) -> Version:
     """Safely parses a version string into a Version object."""
     try:
         return Version.parse(version)
     except ValueError as e:
         # Logs full traceback with context
-        logger.exception("Error parsing %s version (%s)", label, version)
+        logger.exception("Error parsing version:", source=source, version=version)
         # Client sees only this clean message
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "status": "error",
-                "message": f"Invalid {label} version: {version}",
+                "message": f"Invalid {source} version: {version}",
             },
         ) from e
 
@@ -55,7 +55,11 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
     if parsed_current_version < parsed_target_version:
         logger.info("Instrument requires updating")
         logger.info("Calling converter service...")
-        logger.info("Requesting conversion for instrument from %s to %s...", current_version, target_version)
+        logger.info(
+            "Requesting conversion for instrument",
+            current_version=current_version,
+            target_version=target_version,
+        )
 
         converter_service_base_url = os.getenv("CONVERTER_SERVICE_API_BASE_URL")
         converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
@@ -88,7 +92,7 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
                     params={"current_version": str(current_version), "target_version": target_version},
                 )
         except RequestError as e:
-            logger.exception("Error occurred while converting instrument: %s")
+            logger.exception("Error occurred while converting instrument: ", error=e)
             raise HTTPException(
                 status_code=500,
                 detail={

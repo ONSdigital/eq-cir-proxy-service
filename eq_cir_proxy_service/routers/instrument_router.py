@@ -27,10 +27,10 @@ async def get_instrument_by_uuid(
 ) -> Instrument:
     """Retrieve an instrument by its UUID and version."""
     logger.info("Receiving the instrument id...")
-    logger.debug("Received instrument id: %s", instrument_id)
+    logger.debug("Instrument received successfully.", instrument_id=instrument_id)
 
     try:
-        logger.debug("Received version: %s", version)
+        logger.debug("Received version.", version=version)
         logger.info("Validating the version...")
         validate_version(version)
         target_version = version
