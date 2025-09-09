@@ -53,10 +53,8 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
     parsed_target_version = safe_parse("target", target_version)
 
     if parsed_current_version < parsed_target_version:
-        logger.info("Instrument requires updating")
-        logger.info("Calling converter service...")
         logger.info(
-            "Requesting conversion for instrument",
+            "Instrument requires updating. Requesting conversion of instrument by converter service.",
             current_version=current_version,
             target_version=target_version,
         )
@@ -85,11 +83,11 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
 
         url = f"{converter_service_base_url}{converter_service_endpoint}"
         try:
-            async with AsyncClient(timeout=10) as client:
+            async with AsyncClient() as client:
                 response = await client.post(
                     url,
                     json={"instrument": instrument},
-                    params={"current_version": str(current_version), "target_version": target_version},
+                    params={"current_version": current_version, "target_version": target_version},
                 )
         except RequestError as e:
             logger.exception("Error occurred while converting instrument: ", error=e)

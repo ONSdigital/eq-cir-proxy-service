@@ -153,33 +153,15 @@ def test_safe_parse_valid(monkeypatch):
     assert result == "parsed-1.2.3"
 
 
-def test_safe_parse_invalid_current(monkeypatch):
-    """Tests the safe_parse function with an invalid current version."""
-
-    class DummyVersion:  # pylint: disable=too-few-public-methods
-        """Dummy version parser for testing."""
-
-        @staticmethod
-        def parse(s: str):
-            """Parses a version string."""
-            error_message = "bad version"
-            if s == "good":
-                return "parsed-good"
-            raise ValueError(error_message)
-
-    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion_service.Version", DummyVersion)
-
-    with pytest.raises(HTTPException) as exc_info:
-        safe_parse("current", "abc")
-
-    exc = exc_info.value
-    assert exc.status_code == 400
-    assert exc.detail["status"] == "error"
-    assert exc.detail["message"] == "Invalid current version: abc"
-
-
-def test_safe_parse_invalid_target(monkeypatch):
-    """Tests the safe_parse function with an invalid target version."""
+@pytest.mark.parametrize(
+    "version_type, version_value",
+    [
+        ("current", "abc"),
+        ("target", "???"),
+    ],
+)
+def test_safe_parse_invalid_version(version_type, version_value, monkeypatch):
+    """Tests the safe_parse function with an invalid version."""
 
     class DummyVersion:  # pylint: disable=too-few-public-methods
         """Dummy version parser for testing."""
@@ -199,8 +181,9 @@ def test_safe_parse_invalid_target(monkeypatch):
 
     # bad target
     with pytest.raises(HTTPException) as exc_info:
-        safe_parse("target", "???")
+        safe_parse(version_type, version_value)
 
     exc = exc_info.value
     assert exc.status_code == 400
-    assert exc.detail["message"] == "Invalid target version: ???"
+    assert exc.detail["status"] == "error"
+    assert exc.detail["message"] == f"Invalid {version_type} version: {version_value}"
