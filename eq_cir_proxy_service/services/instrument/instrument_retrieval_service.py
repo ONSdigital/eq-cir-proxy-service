@@ -25,7 +25,7 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     Returns:
     - Instrument: The retrieved instrument.
     """
-    logger.info("Retrieving instrument from CIR...", instrument_id=instrument_id)
+    logger.debug("Retrieving instrument from CIR...", instrument_id=instrument_id)
 
     cir_base_url = os.getenv("CIR_API_BASE_URL")
     cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT", "/v2/retrieve_collection_instrument")
@@ -54,7 +54,7 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
         async with AsyncClient() as client:
             response = await client.get(url, params={"guid": str(instrument_id)})
     except RequestError as e:
-        logger.exception("Error occurred while retrieving instrument: ", error=e)
+        logger.exception("Error occurred while retrieving instrument.", error=e)
         raise HTTPException(
             status_code=500,
             detail={

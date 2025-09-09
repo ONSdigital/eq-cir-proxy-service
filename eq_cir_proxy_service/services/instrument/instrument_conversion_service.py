@@ -53,8 +53,8 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
     parsed_target_version = safe_parse("target", target_version)
 
     if parsed_current_version < parsed_target_version:
-        logger.info(
-            "Instrument requires updating. Requesting conversion of instrument by converter service.",
+        logger.debug(
+            "Instrument requires updating. Requesting conversion of instrument by Converter Service...",
             current_version=current_version,
             target_version=target_version,
         )
@@ -95,7 +95,7 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
                 status_code=500,
                 detail={
                     "status": "error",
-                    "message": "Error connecting to Converter service.",
+                    "message": "Error connecting to Converter Service.",
                 },
             ) from e
 

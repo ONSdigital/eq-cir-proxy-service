@@ -26,12 +26,12 @@ async def get_instrument_by_uuid(
     version: str = Query(description="Validator version of the instrument required"),
 ) -> Instrument:
     """Retrieve an instrument by its UUID and version."""
-    logger.info("Receiving the instrument id...")
-    logger.debug("Instrument received successfully.", instrument_id=instrument_id)
+    logger.debug("Receiving the instrument id...", instrument_id=instrument_id)
+    logger.info("Instrument received successfully.")
 
     try:
         logger.debug("Received version.", version=version)
-        logger.info("Validating the version...")
+        logger.debug("Validating the version...")
         validate_version(version)
         target_version = version
 

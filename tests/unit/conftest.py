@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 
 @pytest.fixture
-def fake_post(monkeypatch):
+def mock_post(monkeypatch):
     """Fixture to patch AsyncClient.post and capture calls + response."""
     captured = {}
 
@@ -18,16 +18,16 @@ def fake_post(monkeypatch):
             self.status_code = status_code
 
         def json(self):
-            """Return the fake JSON response data."""
+            """Return the mock JSON response data."""
             return self._data
 
-    async def _fake_post(*args, **kwargs):
-        """Fake AsyncClient.post that captures call args/kwargs and returns a DummyResponse."""
+    async def _mock_post(*args, **kwargs):
+        """Mock AsyncClient.post that captures call args/kwargs and returns a DummyResponse."""
         captured["args"] = args
         captured["kwargs"] = kwargs
         return DummyResponse(captured.get("response_data", {}))
 
-    monkeypatch.setattr(AsyncClient, "post", _fake_post)
+    monkeypatch.setattr(AsyncClient, "post", _mock_post)
 
     return {
         "captured": captured,

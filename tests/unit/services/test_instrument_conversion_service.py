@@ -49,13 +49,13 @@ async def test_convert_instrument_higher_version():
 
 
 @pytest.mark.asyncio
-async def test_convert_instrument_lower_version_success(fake_post, monkeypatch):
-    """Should call converter service and return converted instrument if instrument version < target version."""
+async def test_convert_instrument_lower_version_success(mock_post, monkeypatch):
+    """Should call Converter Service and return converted instrument if instrument version < target version."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     target_version = "2.0.0"
     fake_response_data = {"id": "123", "validator_version": "2.0.0"}
 
-    fake_post["set_response"](fake_response_data)
+    mock_post["set_response"](fake_response_data)
 
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", "http://fake-service")
     monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/convert")
@@ -64,7 +64,7 @@ async def test_convert_instrument_lower_version_success(fake_post, monkeypatch):
 
     assert result == fake_response_data
 
-    captured = fake_post["captured"]
+    captured = mock_post["captured"]
     assert isinstance(captured["args"][0], AsyncClient)
     assert captured["args"][1] == "http://fake-service/convert"
     assert captured["kwargs"]["json"] == {"instrument": instrument}
@@ -76,7 +76,7 @@ async def test_convert_instrument_lower_version_success(fake_post, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_convert_instrument_request_error(monkeypatch):
-    """Should raise 500 if converter service request fails."""
+    """Should raise 500 if Converter Service request fails."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     target_version = "2.0.0"
     error = "failure"
@@ -92,7 +92,7 @@ async def test_convert_instrument_request_error(monkeypatch):
         await convert_instrument(instrument, target_version)
 
     assert excinfo.value.status_code == 500
-    assert excinfo.value.detail["message"] == "Error connecting to Converter service."
+    assert excinfo.value.detail["message"] == "Error connecting to Converter Service."
 
 
 @pytest.mark.asyncio
@@ -169,15 +169,15 @@ def test_safe_parse_invalid_version(version_type, version_value, monkeypatch):
         @staticmethod
         def parse(s: str):
             """Parses a version string."""
-            error_message = "bad version"
-            if s == "good":
-                return "parsed-good"
+            error_message = "invalid version"
+            if s == "valid":
+                return "parsed-valid"
             raise ValueError(error_message)
 
     monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion_service.Version", DummyVersion)
 
-    # good current
-    assert safe_parse("current", "good") == "parsed-good"
+    # valid target
+    assert safe_parse(version_type, "valid") == "parsed-valid"
 
     # bad target
     with pytest.raises(HTTPException) as exc_info:
