@@ -23,7 +23,7 @@ structlog = "^25.4.0"
 # :TODO: Remove black when ruff supports all black rules
 pylint = "^3.3.8"
 black = "^25.1.0"
-pytest = "^8.4.1"
+pytest = "^8.4.2"
 pytest-xdist = "^3.8.0"
 ruff = "^0.12.11"
 pytest-cov = "^6.2.1"
