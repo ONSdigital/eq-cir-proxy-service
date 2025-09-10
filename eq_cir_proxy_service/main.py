@@ -1,12 +1,13 @@
 """Entry point for the FastAPI application."""
 
+import structlog
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from eq_cir_proxy_service.config.logging_config import logging
+from eq_cir_proxy_service.config.logging_config import setup_logging
 from eq_cir_proxy_service.exceptions.exception_messages import (
     exception_404_missing_instrument_id,
     exception_422_invalid_instrument_id,
@@ -16,8 +17,10 @@ from eq_cir_proxy_service.routers import instrument_router
 # Load .env file
 load_dotenv(".env")
 
+setup_logging()
+
 app = FastAPI()
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()
 
 
 @app.get("/")
@@ -35,7 +38,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             invalid_instrument_id = request.path_params.get("instrument_id")
             logger.warning(exception_422_invalid_instrument_id(invalid_instrument_id))
 
-    logger.error("Validation error details: %s", exc.errors())
+    logger.error("Validation error details: ", error=exc.errors())
 
     return JSONResponse(
         status_code=422,

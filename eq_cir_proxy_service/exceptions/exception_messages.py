@@ -2,13 +2,17 @@
 
 import typing
 
-EXCEPTION_500_INSTRUMENT_PROCESSING = "Error encountered while processing the instrument_id"
+EXCEPTION_500_INSTRUMENT_PROCESSING = "Error encountered while processing the instrument_id."
 
 EXCEPTION_400_INVALID_VERSION = (
     "Invalid version format. The version must be in the format x.y.z where x, y, z are numbers."
 )
 
-EXCEPTION_404_INSTRUMENT_NOT_FOUND = "Instrument not found for the provided instrument_id"
+EXCEPTION_404_INSTRUMENT_NOT_FOUND = "Instrument not found for the provided instrument_id."
+
+EXCEPTION_400_INVALID_CONVERSION = "Target version is lower than instrument version."
+
+EXCEPTION_400_INVALID_INSTRUMENT = "Received instrument is not valid."
 
 
 def exception_404_missing_instrument_id(path: str) -> str:
