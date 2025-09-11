@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from fastapi import HTTPException, status
 from semver import VersionInfo
+from structlog import get_logger
 
-from eq_cir_proxy_service.config.logging_config import logging
 from eq_cir_proxy_service.exceptions import exception_messages
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 def validate_version(version: str) -> None:
@@ -20,7 +20,7 @@ def validate_version(version: str) -> None:
     - version: The version to validate.
     """
     if not VersionInfo.is_valid(version):
-        logger.exception("Invalid version: %s", version)
+        logger.exception("Invalid version.", version=version)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_VERSION},
