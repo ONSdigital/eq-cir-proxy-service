@@ -2,15 +2,31 @@
 
 import logging
 import os
+import sys
+
+import structlog
 
 
-def get_log_level() -> int:
-    """Get the logging level from the LOG_LEVEL environment variable, or use the default value of INFO."""
-    log_level = os.getenv("LOG_LEVEL", "INFO")
-    return int(getattr(logging, log_level, logging.INFO))
+def setup_logging() -> None:
+    """Configure structlog and stdlib logging."""
+    log_level = logging.DEBUG if os.getenv("LOG_LEVEL") == "DEBUG" else logging.INFO
 
+    error_log_handler = logging.StreamHandler(sys.stderr)
+    error_log_handler.setLevel(logging.ERROR)
 
-logging.basicConfig(
-    level=get_log_level(),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+    renderer_processor = (
+        structlog.dev.ConsoleRenderer() if log_level == logging.DEBUG else structlog.processors.JSONRenderer()
+    )
+
+    logging.basicConfig(level=log_level, format="%(message)s", stream=sys.stdout)
+
+    structlog.configure(
+        processors=[
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.dev.set_exc_info,
+            renderer_processor,
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+    )

@@ -1,8 +1,9 @@
 # GET /instrument/{instrument_id}
 
-Retrieves a Collection Instrument (CI) from CIR using the provided instrument_id, and returns the instrument to the caller.
+Retrieves a Collection Instrument (CI) from CIR using the provided instrument_id and version,
+and returns the instrument to the caller.
 
-If a version query parameter is provided, and the version parameter does not match the one in the
+If the version parameter does not match the one in the
 retrieved instrument, the instrument is updated via the Converter Service API.
 
 ## Request
@@ -13,7 +14,7 @@ retrieved instrument, the instrument is updated via the Converter Service API.
 
 | Parameter name | Value  | Description                                                    | Additional |
 |----------------|--------|----------------------------------------------------------------|------------|
-| version        | string | Required validator version of retrieved collection instrument. | Optional   |
+| version        | string | Required validator version of retrieved collection instrument. | Required   |
 
 ## Responses
 
