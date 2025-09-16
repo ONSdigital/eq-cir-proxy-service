@@ -3,12 +3,13 @@
 import os
 
 from fastapi import HTTPException, status
-from httpx import AsyncClient, RequestError
+from httpx import RequestError
 from semver import Version
 from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.types.custom_types import Instrument
+from eq_cir_proxy_service.utils.iap import get_converter_service_client
 
 logger = get_logger()
 
@@ -81,23 +82,22 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
                 },
             )
 
-        url = f"{converter_service_base_url}{converter_service_endpoint}"
-        try:
-            async with AsyncClient() as client:
-                response = await client.post(
-                    url,
+        async with get_converter_service_client() as converter_service_api:
+            try:
+                response = await converter_service_api.post(
+                    converter_service_endpoint,
                     json={"instrument": instrument},
                     params={"current_version": current_version, "target_version": target_version},
                 )
-        except RequestError as e:
-            logger.exception("Error occurred while converting instrument: ", error=e)
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "status": "error",
-                    "message": "Error connecting to Converter Service.",
-                },
-            ) from e
+            except RequestError as e:
+                logger.exception("Error occurred while converting instrument.", error=e)
+                raise HTTPException(
+                    status_code=500,
+                    detail={
+                        "status": "error",
+                        "message": "Error connecting to Converter Service.",
+                    },
+                ) from e
 
         instrument_data: Instrument = response.json()
         return instrument_data

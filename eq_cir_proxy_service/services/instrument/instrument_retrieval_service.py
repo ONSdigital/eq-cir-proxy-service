@@ -4,7 +4,7 @@ import os
 from uuid import UUID
 
 from fastapi import HTTPException
-from httpx import AsyncClient, RequestError
+from httpx import RequestError
 from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions.exception_messages import (
@@ -12,6 +12,7 @@ from eq_cir_proxy_service.exceptions.exception_messages import (
     EXCEPTION_500_INSTRUMENT_PROCESSING,
 )
 from eq_cir_proxy_service.types.custom_types import Instrument
+from eq_cir_proxy_service.utils.iap import get_cir_client
 
 logger = get_logger()
 
@@ -49,19 +50,18 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
             },
         )
 
-    url = f"{cir_base_url}{cir_endpoint}"
-    try:
-        async with AsyncClient() as client:
-            response = await client.get(url, params={"guid": str(instrument_id)})
-    except RequestError as e:
-        logger.exception("Error occurred while retrieving instrument.", error=e)
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": "Error connecting to CIR service.",
-            },
-        ) from e
+    async with get_cir_client() as cir_api:
+        try:
+            response = await cir_api.get(cir_endpoint, params={"guid": str(instrument_id)})
+        except RequestError as e:
+            logger.exception("Error occurred while retrieving instrument.", error=e)
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": "Error connecting to CIR service.",
+                },
+            ) from e
 
     if response.status_code == 200:
         logger.info("Instrument retrieved successfully.", instrument_id=instrument_id)

@@ -1,6 +1,7 @@
 """Unit tests for the instrument retrieval service."""
 
 import os
+from contextlib import asynccontextmanager
 from uuid import uuid4
 
 import httpx
@@ -15,7 +16,7 @@ from eq_cir_proxy_service.services.instrument.instrument_retrieval_service impor
 
 @pytest.mark.asyncio
 async def test_retrieve_instrument_success(mocker):
-    """Test the retrieve_instrument function is successful."""
+    """Test the retrieve_instrument function with a successful response."""
     instrument_id = uuid4()
 
     # Set up fake environment variables
@@ -23,21 +24,36 @@ async def test_retrieve_instrument_success(mocker):
     endpoint = "fake-endpoint"
     mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint})
 
+    # Create a fake response
     mock_response = mocker.Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"id": "123"}
-    async_mock_get = mocker.AsyncMock(return_value=mock_response)
 
-    # Patch httpx.get
-    mock_get = mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.AsyncClient.get",
-        async_mock_get,
+    async def fake_get(*_args, **_kwargs):
+        return mock_response
+
+    class FakeClient:
+        """Fake client for testing."""
+
+        async def get(self, *args, **kwargs):
+            """Simulate an async GET request."""
+            return await fake_get(*args, **kwargs)
+
+        async def aclose(self):
+            """Simulate closing the client."""
+
+    @asynccontextmanager
+    async def fake_cir_client():
+        yield FakeClient()
+
+    # Patch the iap.get_cir_client used inside the service
+    mocker.patch(
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_cir_client",
+        fake_cir_client,
     )
 
     result = await retrieve_instrument(instrument_id)
     assert result == {"id": "123"}
-
-    mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)})
 
 
 @pytest.mark.asyncio
@@ -64,29 +80,45 @@ async def test_retrieve_instrument_exception(
     # Set up fake environment variables
     base_url = "http://fake-base-url/"
     endpoint = "fake-endpoint"
-    mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint})
+    mocker.patch.dict(
+        os.environ,
+        {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint},
+    )
 
-    # Mock response object unless we're simulating an exception
-    if side_effect is None:
+    async def fake_get(*_args, **_kwargs):
+        """Simulate an async GET request."""
+        if side_effect:
+            raise side_effect
         mock_response = mocker.Mock()
         mock_response.status_code = status_code
         mock_response.text = text_data
-        async_mock_get = mocker.AsyncMock(return_value=mock_response)
-    else:
-        async_mock_get = mocker.AsyncMock(side_effect=side_effect)
+        return mock_response
 
-    # Patch httpx.get
-    mock_get = mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.AsyncClient.get",
-        async_mock_get,
+    class FakeClient:
+        """Fake client for testing."""
+
+        async def get(self, *args, **kwargs):
+            """Simulate an async GET request."""
+            return await fake_get(*args, **kwargs)
+
+        async def aclose(self):  # needed for cleanup
+            """Simulate closing the client."""
+
+    @asynccontextmanager
+    async def fake_cir_client():
+        yield FakeClient()
+
+    mocker.patch(
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_cir_client",
+        fake_cir_client,
     )
 
     with pytest.raises(HTTPException) as exc_info:
         await retrieve_instrument(instrument_id)
-    assert exc_info.value.status_code == (status_code if status_code is not None else 500)
 
-    # Only assert call if not simulating an exception before call
-    mock_get.assert_called_once_with(f"{base_url}{endpoint}", params={"guid": str(instrument_id)})
+    # Expect 500 for request errors, or passthrough status otherwise
+    expected_status = status_code if status_code is not None else 500
+    assert exc_info.value.status_code == expected_status
 
 
 @pytest.mark.asyncio

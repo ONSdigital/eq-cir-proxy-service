@@ -66,7 +66,7 @@ async def test_convert_instrument_lower_version_success(mock_post, monkeypatch):
 
     captured = mock_post["captured"]
     assert isinstance(captured["args"][0], AsyncClient)
-    assert captured["args"][1] == "http://fake-service/convert"
+    assert captured["args"][1] == "/convert"
     assert captured["kwargs"]["json"] == {"instrument": instrument}
     assert captured["kwargs"]["params"] == {
         "current_version": "1.0.0",
