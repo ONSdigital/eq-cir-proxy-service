@@ -49,20 +49,19 @@ async def test_get_api_client_gcp(monkeypatch):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "client_name, local_url, url_env, iap_env",
+    "local_url, url_env, iap_env",
     [
         # get_cir_client
-        (iap.get_cir_client(), "http://localhost:5004", "CIR_API_BASE_URL", "CIR_IAP_CLIENT_ID"),
+        ("http://localhost:5004", "CIR_API_BASE_URL", "CIR_IAP_CLIENT_ID"),
         # get_converter_service_client
         (
-            iap.get_converter_service_client(),
             "http://localhost:5010",
             "CONVERTER_SERVICE_API_BASE_URL",
             "CONVERTER_SERVICE_IAP_CLIENT_ID",
         ),
     ],
 )
-async def test_get_client(client_name, local_url, url_env, iap_env, monkeypatch):
+async def test_get_client(local_url, url_env, iap_env, monkeypatch):
     """Test the get_converter_service_client function."""
     monkeypatch.setenv("ENV", "local")
 
@@ -84,7 +83,7 @@ async def test_get_client(client_name, local_url, url_env, iap_env, monkeypatch)
 
     monkeypatch.setattr(iap, "get_api_client", fake_api_client)
 
-    async with client_name as client:
+    async with iap.get_api_client(local_url, url_env, iap_env) as client:
         assert client == "fake-client"
 
     assert called_args["local_url"] == local_url
@@ -98,5 +97,5 @@ async def test_get_cir_client_invalid_env(monkeypatch):
     monkeypatch.setenv("ENV", "nonsense")
 
     with pytest.raises(ValueError, match="Unknown ENV: nonsense"):
-        async with iap.get_cir_client():
+        async with iap.get_api_client("http://localhost:5004", "CIR_API_BASE_URL", "CIR_IAP_CLIENT_ID"):
             pass  # should never reach here

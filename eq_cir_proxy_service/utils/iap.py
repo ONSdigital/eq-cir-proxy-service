@@ -51,28 +51,3 @@ async def get_api_client(local_url: str, url_env: str, iap_env: str) -> AsyncIte
         yield client
     finally:
         await client.aclose()
-
-
-# --- API-specific wrappers ---
-
-
-@asynccontextmanager
-async def get_cir_client() -> AsyncIterator[AsyncClient]:
-    """Context-managed httpx.AsyncClient for CIR service."""
-    async with get_api_client(
-        local_url="http://localhost:5004",
-        url_env="CIR_API_BASE_URL",
-        iap_env="CIR_IAP_CLIENT_ID",
-    ) as client:
-        yield client
-
-
-@asynccontextmanager
-async def get_converter_service_client() -> AsyncIterator[AsyncClient]:
-    """Context-managed httpx.AsyncClient for Converter Service."""
-    async with get_api_client(
-        local_url="http://localhost:5010",
-        url_env="CONVERTER_SERVICE_API_BASE_URL",
-        iap_env="CONVERTER_SERVICE_IAP_CLIENT_ID",
-    ) as client:
-        yield client

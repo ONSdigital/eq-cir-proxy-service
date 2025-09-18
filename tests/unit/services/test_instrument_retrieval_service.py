@@ -43,13 +43,13 @@ async def test_retrieve_instrument_success(mocker):
             """Simulate closing the client."""
 
     @asynccontextmanager
-    async def fake_cir_client():
+    async def fake_api_client(**_kwargs):
         yield FakeClient()
 
-    # Patch the iap.get_cir_client used inside the service
+    # Patch the iap.get_api_client used inside the service
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_cir_client",
-        fake_cir_client,
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_api_client",
+        fake_api_client,
     )
 
     result = await retrieve_instrument(instrument_id)
@@ -105,12 +105,12 @@ async def test_retrieve_instrument_exception(
             """Simulate closing the client."""
 
     @asynccontextmanager
-    async def fake_cir_client():
+    async def fake_api_client(**_kwargs):
         yield FakeClient()
 
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_cir_client",
-        fake_cir_client,
+        "eq_cir_proxy_service.services.instrument.instrument_retrieval_service.get_api_client",
+        fake_api_client,
     )
 
     with pytest.raises(HTTPException) as exc_info:
@@ -119,28 +119,6 @@ async def test_retrieve_instrument_exception(
     # Expect 500 for request errors, or passthrough status otherwise
     expected_status = status_code if status_code is not None else 500
     assert exc_info.value.status_code == expected_status
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "environment_variables",
-    [
-        # No URL
-        ({}),
-        # Empty URL
-        ({"CIR_API_BASE_URL": ""}),
-    ],
-)
-async def test_retrieve_instrument_missing_cir_base_url(environment_variables, mocker):
-    """Test retrieve_instrument raises HTTPException if CIR_API_BASE_URL is missing or empty."""
-    instrument_id = uuid4()
-    # Patch environment to remove CIR_API_BASE_URL
-    mocker.patch.dict(os.environ, environment_variables, clear=True)
-    with pytest.raises(HTTPException) as exc_info:
-        await instrument_retrieval_service.retrieve_instrument(instrument_id)
-    exc = exc_info.value
-    assert exc.status_code == 500
-    assert exc.detail["message"] == "CIR_API_BASE_URL configuration is missing."
 
 
 @pytest.mark.asyncio

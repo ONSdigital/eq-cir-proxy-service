@@ -96,29 +96,6 @@ async def test_convert_instrument_request_error(monkeypatch):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "environment_variables",
-    [
-        # No URL
-        ({}),
-        # Empty URL
-        ({"CONVERTER_SERVICE_API_BASE_URL": ""}),
-    ],
-)
-async def test_retrieve_instrument_missing_converter_base_url(environment_variables, mocker):
-    """Test convert_instrument raises HTTPException if CONVERTER_SERVICE_API_BASE_URL is missing or empty."""
-    instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
-    target_version = "2.0.0"
-    # Patch environment to remove CONVERTER_SERVICE_API_BASE_URL
-    mocker.patch.dict(os.environ, environment_variables, clear=True)
-    with pytest.raises(HTTPException) as exc_info:
-        await convert_instrument(instrument, target_version)
-    exc = exc_info.value
-    assert exc.status_code == 500
-    assert exc.detail["message"] == "CONVERTER_SERVICE_API_BASE_URL configuration is missing."
-
-
-@pytest.mark.asyncio
 async def test_retrieve_instrument_missing_converter_endpoint(mocker):
     """Test convert_instrument raises HTTPException if CONVERTER_SERVICE_CONVERT_CI_ENDPOINT exists but has no value."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}

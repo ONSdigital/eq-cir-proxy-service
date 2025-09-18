@@ -9,7 +9,7 @@ from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.types.custom_types import Instrument
-from eq_cir_proxy_service.utils.iap import get_converter_service_client
+from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
 
@@ -60,18 +60,8 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
             target_version=target_version,
         )
 
-        converter_service_base_url = os.getenv("CONVERTER_SERVICE_API_BASE_URL")
         converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
 
-        if not converter_service_base_url:
-            logger.error("CONVERTER_SERVICE_API_BASE_URL is not configured.")
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "status": "error",
-                    "message": "CONVERTER_SERVICE_API_BASE_URL configuration is missing.",
-                },
-            )
         if not converter_service_endpoint:
             logger.error("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT is not configured.")
             raise HTTPException(
@@ -82,7 +72,11 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
                 },
             )
 
-        async with get_converter_service_client() as converter_service_api:
+        async with get_api_client(
+            local_url="http://localhost:5010",
+            url_env="CONVERTER_SERVICE_API_BASE_URL",
+            iap_env="CONVERTER_SERVICE_IAP_CLIENT_ID",
+        ) as converter_service_api:
             try:
                 response = await converter_service_api.post(
                     converter_service_endpoint,
