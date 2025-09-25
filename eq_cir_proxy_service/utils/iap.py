@@ -8,6 +8,9 @@ from typing import cast
 import google.auth.transport.requests
 import google.oauth2.id_token
 from httpx import AsyncClient
+from structlog import get_logger
+
+logger = get_logger()
 
 
 def get_iap_token(audience: str) -> str:
@@ -15,6 +18,7 @@ def get_iap_token(audience: str) -> str:
     request = google.auth.transport.requests.Request()  # type: ignore[no-untyped-call]
     token = google.oauth2.id_token.fetch_id_token(request, audience)  # type: ignore[no-untyped-call]
     if token is None:
+        logger.error("Failed to fetch IAP token", audience=audience)
         error_message = f"Failed to fetch IAP token for audience {audience}"
         raise RuntimeError(error_message)
     return cast(str, token)
@@ -36,8 +40,10 @@ async def get_api_client(*, local_url: str, url_env: str, iap_env: str) -> Async
     env = os.getenv("ENV", "local")
 
     if env == "local":
+        logger.info("Using local API client", local_url=local_url)
         client = AsyncClient(base_url=local_url)
     elif env == "gcp":
+        logger.info("Using GCP API client", url_env=url_env, iap_env=iap_env)
         base_url = os.environ[url_env]
         audience = os.environ[iap_env]
         client = AsyncClient(
@@ -45,6 +51,7 @@ async def get_api_client(*, local_url: str, url_env: str, iap_env: str) -> Async
             headers={"Authorization": f"Bearer {get_iap_token(audience)}"},
         )
     else:
+        logger.error("Unknown ENV configuration", env=env)
         raise ValueError(unknown_env_error(env))
 
     try:
