@@ -83,7 +83,7 @@ async def test_get_client(local_url, url_env, iap_env, monkeypatch):
 
     monkeypatch.setattr(iap, "get_api_client", fake_api_client)
 
-    async with iap.get_api_client(local_url, url_env, iap_env) as client:
+    async with iap.get_api_client(local_url=local_url, url_env=url_env, iap_env=iap_env) as client:
         assert client == "fake-client"
 
     assert called_args["local_url"] == local_url
@@ -97,5 +97,9 @@ async def test_get_cir_client_invalid_env(monkeypatch):
     monkeypatch.setenv("ENV", "nonsense")
 
     with pytest.raises(ValueError, match="Unknown ENV: nonsense"):
-        async with iap.get_api_client(local_url="http://localhost:5004", url_env="CIR_API_BASE_URL", iap_env="CIR_IAP_CLIENT_ID"):
+        async with iap.get_api_client(
+            local_url="http://localhost:5004",
+            url_env="CIR_API_BASE_URL",
+            iap_env="CIR_IAP_CLIENT_ID",
+        ):
             pass  # should never reach here
