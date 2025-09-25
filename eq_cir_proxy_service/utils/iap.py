@@ -26,7 +26,7 @@ def unknown_env_error(env: str) -> str:
 
 
 @asynccontextmanager
-async def get_api_client(local_url: str, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
+async def get_api_client(*, local_url: str, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
     """Context-managed httpx.AsyncClient that switches between local and GCP/IAP.
 
     local_url: base URL when ENV=local

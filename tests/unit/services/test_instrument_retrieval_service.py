@@ -19,17 +19,17 @@ async def test_retrieve_instrument_success(mocker):
     """Test the retrieve_instrument function with a successful response."""
     instrument_id = uuid4()
 
-    # Set up fake environment variables
+    # Set up mocked environment variables
     base_url = "http://fake-base-url/"
     endpoint = "fake-endpoint"
     mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint})
 
-    # Create a fake response
+    # Create a mocked response
     mock_response = mocker.Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"id": "123"}
 
-    async def fake_get(*_args, **_kwargs):
+    async def mock_get(*_args, **_kwargs):
         return mock_response
 
     class FakeClient:
@@ -37,7 +37,7 @@ async def test_retrieve_instrument_success(mocker):
 
         async def get(self, *args, **kwargs):
             """Simulate an async GET request."""
-            return await fake_get(*args, **kwargs)
+            return await mock_get(*args, **kwargs)
 
         async def aclose(self):
             """Simulate closing the client."""
@@ -77,7 +77,7 @@ async def test_retrieve_instrument_exception(
     """Test the retrieve_instrument function with various exception scenarios."""
     instrument_id = uuid4()
 
-    # Set up fake environment variables
+    # Set up mocked environment variables
     base_url = "http://fake-base-url/"
     endpoint = "fake-endpoint"
     mocker.patch.dict(
@@ -85,7 +85,7 @@ async def test_retrieve_instrument_exception(
         {"CIR_API_BASE_URL": base_url, "CIR_RETRIEVE_CI_ENDPOINT": endpoint},
     )
 
-    async def fake_get(*_args, **_kwargs):
+    async def mock_get(*_args, **_kwargs):
         """Simulate an async GET request."""
         if side_effect:
             raise side_effect
@@ -99,7 +99,7 @@ async def test_retrieve_instrument_exception(
 
         async def get(self, *args, **kwargs):
             """Simulate an async GET request."""
-            return await fake_get(*args, **kwargs)
+            return await mock_get(*args, **kwargs)
 
         async def aclose(self):  # needed for cleanup
             """Simulate closing the client."""

@@ -29,7 +29,7 @@ def test_get_iap_token_failure(monkeypatch):
 async def test_get_api_client_local(monkeypatch):
     """Test that get_api_client sets up the client with correct parameters for local."""
     monkeypatch.setenv("ENV", "local")
-    async with iap.get_api_client("http://localhost:1234", "URL_ENV", "IAP_ENV") as client:
+    async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV") as client:
         assert client.base_url.host == "localhost"
 
 
@@ -42,7 +42,7 @@ async def test_get_api_client_gcp(monkeypatch):
 
     monkeypatch.setattr(iap, "get_iap_token", lambda _: "fake-token")
 
-    async with iap.get_api_client("http://localhost:1234", "URL_ENV", "IAP_ENV") as client:
+    async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV") as client:
         assert client.base_url.host == "example.com"
         assert client.headers["Authorization"] == "Bearer fake-token"
 
@@ -97,5 +97,5 @@ async def test_get_cir_client_invalid_env(monkeypatch):
     monkeypatch.setenv("ENV", "nonsense")
 
     with pytest.raises(ValueError, match="Unknown ENV: nonsense"):
-        async with iap.get_api_client("http://localhost:5004", "CIR_API_BASE_URL", "CIR_IAP_CLIENT_ID"):
+        async with iap.get_api_client(local_url="http://localhost:5004", url_env="CIR_API_BASE_URL", iap_env="CIR_IAP_CLIENT_ID"):
             pass  # should never reach here
