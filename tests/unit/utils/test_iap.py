@@ -103,3 +103,47 @@ async def test_get_cir_client_invalid_env(monkeypatch):
             iap_env="CIR_IAP_CLIENT_ID",
         ):
             pass  # should never reach here
+
+
+@pytest.mark.asyncio
+async def test_get_api_client_gcp_missing_url_env(monkeypatch):
+    """Test that get_api_client raises RuntimeError if url_env is missing or empty."""
+    monkeypatch.setenv("ENV", "gcp")
+    monkeypatch.delenv("URL_ENV", raising=False)  # Ensure URL_ENV is not set
+    monkeypatch.setenv("IAP_ENV", "fake-audience")
+    with pytest.raises(RuntimeError, match="Missing or empty environment variable: URL_ENV"):
+        async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV"):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_get_api_client_gcp_missing_iap_env(monkeypatch):
+    """Test that get_api_client raises RuntimeError if iap_env is missing or empty."""
+    monkeypatch.setenv("ENV", "gcp")
+    monkeypatch.setenv("URL_ENV", "https://example.com")
+    monkeypatch.delenv("IAP_ENV", raising=False)  # Ensure IAP_ENV is not set
+    with pytest.raises(RuntimeError, match="Missing or empty environment variable: IAP_ENV"):
+        async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV"):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_get_api_client_gcp_empty_url_env(monkeypatch):
+    """Test that get_api_client raises RuntimeError if url_env is set but empty."""
+    monkeypatch.setenv("ENV", "gcp")
+    monkeypatch.setenv("URL_ENV", "")
+    monkeypatch.setenv("IAP_ENV", "fake-audience")
+    with pytest.raises(RuntimeError, match="Missing or empty environment variable: URL_ENV"):
+        async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV"):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_get_api_client_gcp_empty_iap_env(monkeypatch):
+    """Test that get_api_client raises RuntimeError if iap_env is set but empty."""
+    monkeypatch.setenv("ENV", "gcp")
+    monkeypatch.setenv("URL_ENV", "https://example.com")
+    monkeypatch.setenv("IAP_ENV", "")
+    with pytest.raises(RuntimeError, match="Missing or empty environment variable: IAP_ENV"):
+        async with iap.get_api_client(local_url="http://localhost:1234", url_env="URL_ENV", iap_env="IAP_ENV"):
+            pass

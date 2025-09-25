@@ -4,7 +4,7 @@ import os
 
 import pytest
 from fastapi import HTTPException, status
-from httpx import AsyncClient, RequestError
+from httpx import RequestError
 
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.services.instrument.instrument_conversion_service import (
@@ -49,14 +49,51 @@ async def test_convert_instrument_higher_version():
 
 
 @pytest.mark.asyncio
-async def test_convert_instrument_lower_version_success(mock_post, monkeypatch):
+async def test_convert_instrument_lower_version_success(monkeypatch):
     """Should call Converter Service and return converted instrument if instrument version < target version."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     target_version = "2.0.0"
     fake_response_data = {"id": "123", "validator_version": "2.0.0"}
 
-    mock_post["set_response"](fake_response_data)
+    class DummyResponse:
+        """Dummy response for testing."""
 
+        def __init__(self, json_data):
+            self._json = json_data
+
+        def raise_for_status(self):
+            """Simulate raise_for_status."""
+
+        def json(self):
+            """Return the JSON data."""
+            return self._json
+
+    class DummyAsyncClient:
+        """Dummy async client for testing."""
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def post(self, url, **kwargs):
+            """Simulate a post request."""
+            assert url == "/convert"
+            assert kwargs["json"] == {"instrument": instrument}
+            assert kwargs["params"] == {
+                "current_version": "1.0.0",
+                "target_version": "2.0.0",
+            }
+            return DummyResponse(fake_response_data)
+
+    def dummy_get_api_client(*_args, **_kwargs):
+        return DummyAsyncClient()
+
+    monkeypatch.setattr(
+        "eq_cir_proxy_service.services.instrument.instrument_conversion_service.get_api_client",
+        dummy_get_api_client,
+    )
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", "http://fake-service")
     monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/convert")
 
@@ -64,29 +101,41 @@ async def test_convert_instrument_lower_version_success(mock_post, monkeypatch):
 
     assert result == fake_response_data
 
-    captured = mock_post["captured"]
-    assert isinstance(captured["args"][0], AsyncClient)
-    assert captured["args"][1] == "/convert"
-    assert captured["kwargs"]["json"] == {"instrument": instrument}
-    assert captured["kwargs"]["params"] == {
-        "current_version": "1.0.0",
-        "target_version": "2.0.0",
-    }
-
 
 @pytest.mark.asyncio
-async def test_convert_instrument_request_error(monkeypatch):
-    """Should raise 500 if Converter Service request fails."""
+async def test_convert_instrument_request_error_with_iap(monkeypatch):
+    """Should raise 500 if Converter Service request fails (IAP client version)."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     target_version = "2.0.0"
     error = "failure"
 
-    async def _raise_error(_client, _url, **_kwargs):
-        raise RequestError(error, request=None)
+    # Patch the IAP AsyncClient context manager to raise RequestError on post
+    class DummyIAPClient:
+        """Dummy IAP client for testing."""
 
-    monkeypatch.setattr(AsyncClient, "post", _raise_error)
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def post(self, *_args, **_kwargs):
+            """Simulate a post that raises RequestError."""
+            raise RequestError(error, request=None)
+
+        def __call__(self, *_args, **_kwargs):
+            return self
+
+    monkeypatch.setattr(
+        "eq_cir_proxy_service.services.instrument.instrument_conversion_service.get_api_client",
+        DummyIAPClient(),
+    )
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", "http://fake-service")
     monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/convert")
+    monkeypatch.setenv("CONVERTER_SERVICE_IAP_CLIENT_ID", "dummy-client-id")
 
     with pytest.raises(HTTPException) as excinfo:
         await convert_instrument(instrument, target_version)

@@ -44,8 +44,19 @@ async def get_api_client(*, local_url: str, url_env: str, iap_env: str) -> Async
         client = AsyncClient(base_url=local_url)
     elif env == "gcp":
         logger.info("Using GCP API client", url_env=url_env, iap_env=iap_env)
-        base_url = os.environ[url_env]
-        audience = os.environ[iap_env]
+
+        base_url = os.getenv(url_env)
+        audience = os.getenv(iap_env)
+
+        if not base_url:
+            logger.error("Missing or empty environment variable for GCP base URL", var=url_env)
+            base_url_error = f"Missing or empty environment variable: {url_env}"
+            raise RuntimeError(base_url_error)
+        if not audience:
+            logger.error("Missing or empty environment variable for IAP client ID", var=iap_env)
+            iap_error = f"Missing or empty environment variable: {iap_env}"
+            raise RuntimeError(iap_error)
+
         client = AsyncClient(
             base_url=base_url,
             headers={"Authorization": f"Bearer {get_iap_token(audience)}"},
