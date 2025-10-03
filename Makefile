@@ -52,7 +52,7 @@ megalint:  ## Run the MegaLinter.
 	docker run --platform linux/amd64 --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock:rw \
 		-v $(shell pwd):/tmp/lint:rw \
-		oxsecurity/megalinter-python:v8.8.0
+		ghcr.io/oxsecurity/megalinter-python:v9.0.1
 
 .PHONY: docker-build
 docker-build:  ## Build the docker image.
