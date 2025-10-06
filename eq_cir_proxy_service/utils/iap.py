@@ -24,46 +24,30 @@ def get_iap_token(audience: str) -> str:
     return cast(str, token)
 
 
-def unknown_env_error(env: str) -> str:
-    """Returns an error message for unknown environment."""
-    return f"Unknown ENV: {env}"
-
-
 @asynccontextmanager
-async def get_api_client(*, local_url: str, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
+async def get_api_client(*, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
     """Context-managed httpx.AsyncClient that switches between local and GCP/IAP.
 
-    local_url: base URL when ENV=local
     url_env: environment variable holding the GCP base URL
     iap_env: environment variable holding the IAP client ID
     """
-    env = os.getenv("ENV", "local")
+    base_url = os.getenv(url_env)
+    audience = os.getenv(iap_env)
 
-    if env == "local":
-        logger.info("Using local API client", local_url=local_url)
-        client = AsyncClient(base_url=local_url)
-    elif env == "gcp":
+    if not base_url:
+        logger.error("Missing or empty environment variable for GCP base URL", var=url_env)
+        base_url_error = f"Missing or empty environment variable: {url_env}"
+        raise RuntimeError(base_url_error)
+
+    if audience:
         logger.info("Using GCP API client", url_env=url_env, iap_env=iap_env)
-
-        base_url = os.getenv(url_env)
-        audience = os.getenv(iap_env)
-
-        if not base_url:
-            logger.error("Missing or empty environment variable for GCP base URL", var=url_env)
-            base_url_error = f"Missing or empty environment variable: {url_env}"
-            raise RuntimeError(base_url_error)
-        if not audience:
-            logger.error("Missing or empty environment variable for IAP client ID", var=iap_env)
-            iap_error = f"Missing or empty environment variable: {iap_env}"
-            raise RuntimeError(iap_error)
-
         client = AsyncClient(
             base_url=base_url,
             headers={"Authorization": f"Bearer {get_iap_token(audience)}"},
         )
     else:
-        logger.error("Unknown ENV configuration", env=env)
-        raise ValueError(unknown_env_error(env))
+        logger.info("No IAP client ID set. Using local API client.")
+        client = AsyncClient(base_url=base_url)
 
     try:
         yield client

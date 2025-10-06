@@ -73,7 +73,6 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
             )
 
         async with get_api_client(
-            local_url="http://localhost:5010",
             url_env="CONVERTER_SERVICE_API_BASE_URL",
             iap_env="CONVERTER_SERVICE_IAP_CLIENT_ID",
         ) as converter_service_api:

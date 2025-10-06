@@ -41,7 +41,6 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
         )
 
     async with get_api_client(
-        local_url="http://localhost:5004",
         url_env="CIR_API_BASE_URL",
         iap_env="CIR_IAP_CLIENT_ID",
     ) as cir_api:
