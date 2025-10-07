@@ -75,9 +75,9 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
         async with get_api_client(
             url_env="CONVERTER_SERVICE_API_BASE_URL",
             iap_env="CONVERTER_SERVICE_IAP_CLIENT_ID",
-        ) as converter_service_api:
+        ) as converter_service_api_client:
             try:
-                response = await converter_service_api.post(
+                response = await converter_service_api_client.post(
                     converter_service_endpoint,
                     json={"instrument": instrument},
                     params={"current_version": current_version, "target_version": target_version},

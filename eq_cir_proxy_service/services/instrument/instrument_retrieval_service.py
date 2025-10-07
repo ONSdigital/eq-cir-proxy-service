@@ -43,9 +43,9 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     async with get_api_client(
         url_env="CIR_API_BASE_URL",
         iap_env="CIR_IAP_CLIENT_ID",
-    ) as cir_api:
+    ) as cir_api_client:
         try:
-            response = await cir_api.get(cir_endpoint, params={"guid": str(instrument_id)})
+            response = await cir_api_client.get(cir_endpoint, params={"guid": str(instrument_id)})
         except RequestError as e:
             logger.exception("Error occurred while retrieving instrument.", error=e)
             raise HTTPException(

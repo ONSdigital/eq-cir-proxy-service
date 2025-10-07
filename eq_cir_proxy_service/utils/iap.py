@@ -5,8 +5,8 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import cast
 
-import google.auth.transport.requests
 import google.oauth2.id_token
+from google.auth.transport import requests
 from httpx import AsyncClient
 from structlog import get_logger
 
@@ -15,8 +15,7 @@ logger = get_logger()
 
 def get_iap_token(audience: str) -> str:
     """Fetch an ID token for the IAP-secured resource (blocking)."""
-    request = google.auth.transport.requests.Request()  # type: ignore[no-untyped-call]
-    token = google.oauth2.id_token.fetch_id_token(request, audience)  # type: ignore[no-untyped-call]
+    token = google.oauth2.id_token.fetch_id_token(requests.Request(), audience)  # type: ignore[no-untyped-call]
     if token is None:
         logger.error("Failed to fetch IAP token", audience=audience)
         error_message = f"Failed to fetch IAP token for audience {audience}"
@@ -26,10 +25,13 @@ def get_iap_token(audience: str) -> str:
 
 @asynccontextmanager
 async def get_api_client(*, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
-    """Context-managed httpx.AsyncClient that switches between local and GCP/IAP.
+    """Context-managed httpx.AsyncClient that switches between IAP and non-IAP connections.
 
-    url_env: environment variable holding the GCP base URL
-    iap_env: environment variable holding the IAP client ID
+    :param url_env: environment variable holding the base URL of the API
+    :param iap_env: environment variable holding the IAP client ID of the API
+    :raises RuntimeError: if the base URL environment variable is missing or empty
+
+    :yields: an httpx.AsyncClient instance
     """
     base_url = os.getenv(url_env)
     audience = os.getenv(iap_env)
