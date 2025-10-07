@@ -19,7 +19,16 @@ def test_get_iap_token_failure(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_get_api_client_local(monkeypatch):
+async def test_get_api_client_missing_iap_env(monkeypatch):
+    """Test that get_api_client sets up the client with correct parameters for local."""
+    monkeypatch.setenv("URL_ENV", "https://localhost:1234")
+    monkeypatch.delenv("IAP_ENV", raising=False)  # Ensure IAP_ENV is not set
+    async with iap.get_api_client(url_env="URL_ENV", iap_env="IAP_ENV") as client:
+        assert client.base_url.host == "localhost"
+
+
+@pytest.mark.asyncio
+async def test_get_api_client_empty_iap_env(monkeypatch):
     """Test that get_api_client sets up the client with correct parameters for local."""
     monkeypatch.setenv("URL_ENV", "https://localhost:1234")
     monkeypatch.setenv("IAP_ENV", "")
