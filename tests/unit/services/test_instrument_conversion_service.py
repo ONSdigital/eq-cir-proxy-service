@@ -1,6 +1,7 @@
 """Unit tests for the instrument conversion service."""
 
 import os
+from dataclasses import dataclass
 
 import pytest
 from fastapi import HTTPException, status
@@ -12,10 +13,76 @@ from eq_cir_proxy_service.services.instrument.instrument_conversion_service impo
     safe_parse,
 )
 
+FAKE_API_URL = "http://fake-service"
+FAKE_CONVERT_ENDPOINT = "/convert"
+
+
+@dataclass
+class DummyResponse:
+    """Dummy response for testing."""
+
+    json_data: dict
+
+    def raise_for_status(self):
+        """Simulate raise_for_status (no-op for testing)."""
+
+    def json(self):
+        """Return the JSON data."""
+        return self.json_data
+
+
+@dataclass
+class DummyAsyncClient:
+    """Dummy async client for testing."""
+
+    expected_instrument: dict
+    expected_response: dict
+    target_version: str
+
+    async def __aenter__(self):
+        """Simulate async context manager enter."""
+        return self
+
+    async def __aexit__(self, *_):
+        """Simulate async context manager exit."""
+
+    async def post(self, url, **kwargs):
+        """Simulate post method to check parameters and return dummy response."""
+        assert url == "/convert"
+        assert kwargs["json"] == {"instrument": self.expected_instrument}
+        assert kwargs["params"] == {
+            "current_version": self.expected_instrument["validator_version"],
+            "target_version": self.target_version,
+        }
+        return DummyResponse(self.expected_response)
+
+
+@dataclass
+class DummyIAPClient:
+    """Dummy IAP client for testing."""
+
+    error = "failure"
+
+    async def __aenter__(self):
+        """Simulate async context manager enter."""
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        """Simulate async context manager exit."""
+
+    async def post(self, *_args, **_kwargs):
+        """Simulate a post that raises RequestError."""
+        raise RequestError(self.error, request=None)
+
+    def __call__(self, *_args, **_kwargs):
+        """Simulate callable to return self."""
+        return self
+
 
 @pytest.mark.asyncio
 async def test_convert_instrument_missing_version(caplog):
     """Should raise 404 if validator_version is missing."""
+    caplog.set_level("INFO")
     instrument = {"id": "123", "sections": []}  # no validator_version
 
     with pytest.raises(HTTPException) as excinfo:
@@ -23,7 +90,9 @@ async def test_convert_instrument_missing_version(caplog):
 
     assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
-    assert "Instrument version is missing" in caplog.text
+    assert any(
+        record.levelname == "ERROR" and "Instrument version is missing" in record.message for record in caplog.records
+    )
 
 
 @pytest.mark.asyncio
@@ -33,7 +102,10 @@ async def test_convert_instrument_same_version(caplog):
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     result = await convert_instrument(instrument, "1.0.0")
     assert result == instrument
-    assert "Instrument version matches the target" in caplog.text
+    assert any(
+        record.levelname == "INFO" and "Instrument version matches the target" in record.message
+        for record in caplog.records
+    )
 
 
 @pytest.mark.asyncio
@@ -55,47 +127,19 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
     target_version = "2.0.0"
     fake_response_data = {"id": "123", "validator_version": "2.0.0"}
 
-    class DummyResponse:
-        """Dummy response for testing."""
-
-        def __init__(self, json_data):
-            self._json = json_data
-
-        def raise_for_status(self):
-            """Simulate raise_for_status."""
-
-        def json(self):
-            """Return the JSON data."""
-            return self._json
-
-    class DummyAsyncClient:
-        """Dummy async client for testing."""
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            pass
-
-        async def post(self, url, **kwargs):
-            """Simulate a post request."""
-            assert url == "/convert"
-            assert kwargs["json"] == {"instrument": instrument}
-            assert kwargs["params"] == {
-                "current_version": "1.0.0",
-                "target_version": "2.0.0",
-            }
-            return DummyResponse(fake_response_data)
-
     def dummy_get_api_client(*_args, **_kwargs):
-        return DummyAsyncClient()
+        return DummyAsyncClient(
+            expected_instrument=instrument,
+            expected_response=fake_response_data,
+            target_version=target_version,
+        )
 
     monkeypatch.setattr(
         "eq_cir_proxy_service.services.instrument.instrument_conversion_service.get_api_client",
         dummy_get_api_client,
     )
-    monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", "http://fake-service")
-    monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/convert")
+    monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
+    monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", FAKE_CONVERT_ENDPOINT)
 
     result = await convert_instrument(instrument, target_version)
 
@@ -107,34 +151,13 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
     """Should raise 500 if Converter Service request fails (IAP client version)."""
     instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
     target_version = "2.0.0"
-    error = "failure"
-
-    # Patch the IAP AsyncClient context manager to raise RequestError on post
-    class DummyIAPClient:
-        """Dummy IAP client for testing."""
-
-        def __init__(self, *args, **kwargs):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            pass
-
-        async def post(self, *_args, **_kwargs):
-            """Simulate a post that raises RequestError."""
-            raise RequestError(error, request=None)
-
-        def __call__(self, *_args, **_kwargs):
-            return self
 
     monkeypatch.setattr(
         "eq_cir_proxy_service.services.instrument.instrument_conversion_service.get_api_client",
         DummyIAPClient(),
     )
-    monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", "http://fake-service")
-    monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/convert")
+    monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
+    monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", FAKE_CONVERT_ENDPOINT)
     monkeypatch.setenv("CONVERTER_SERVICE_IAP_CLIENT_ID", "dummy-client-id")
 
     with pytest.raises(HTTPException) as excinfo:

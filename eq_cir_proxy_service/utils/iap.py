@@ -3,7 +3,6 @@
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import cast
 
 import google.oauth2.id_token
 from google.auth.transport import requests
@@ -15,12 +14,12 @@ logger = get_logger()
 
 def get_iap_token(audience: str) -> str:
     """Fetch an ID token for the IAP-secured resource (blocking)."""
-    token = google.oauth2.id_token.fetch_id_token(requests.Request(), audience)  # type: ignore[no-untyped-call]
+    token: str = google.oauth2.id_token.fetch_id_token(requests.Request(), audience)  # type: ignore[no-untyped-call]
     if token is None:
         logger.error("Failed to fetch IAP token", audience=audience)
         error_message = f"Failed to fetch IAP token for audience {audience}"
         raise RuntimeError(error_message)
-    return cast(str, token)
+    return token
 
 
 @asynccontextmanager
