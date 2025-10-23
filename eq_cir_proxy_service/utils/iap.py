@@ -26,11 +26,15 @@ def get_iap_token(audience: str) -> str:
 async def get_api_client(*, url_env: str, iap_env: str) -> AsyncIterator[AsyncClient]:
     """Context-managed httpx.AsyncClient that switches between IAP and non-IAP connections.
 
-    :param url_env: environment variable holding the base URL of the API
-    :param iap_env: environment variable holding the IAP client ID of the API
-    :raises RuntimeError: if the base URL environment variable is missing or empty
+    Args:
+        url_env (str): Environment variable holding the base URL of the API
+        iap_env (str): Environment variable holding the IAP client ID of the API
 
-    :yields: an httpx.AsyncClient instance
+    Raises:
+        RuntimeError: If the base URL environment variable is missing or empty
+
+    Yields:
+        httpx.AsyncClient: An httpx.AsyncClient instance
     """
     base_url = os.getenv(url_env)
     audience = os.getenv(iap_env)

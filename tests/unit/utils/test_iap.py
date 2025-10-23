@@ -6,13 +6,13 @@ from eq_cir_proxy_service.utils import iap
 
 
 def test_get_iap_token_success(monkeypatch):
-    """Tests that get_iap_token successfully fetches a token."""
+    """Test that get_iap_token successfully fetches a token."""
     monkeypatch.setattr(iap.google.oauth2.id_token, "fetch_id_token", lambda *_: "fake-token")
     assert iap.get_iap_token("fake-audience") == "fake-token"
 
 
 def test_get_iap_token_failure(monkeypatch):
-    """Tests that get_iap_token raises RuntimeError when token fetch fails."""
+    """Test that get_iap_token raises RuntimeError when token fetch fails."""
     monkeypatch.setattr(iap.google.oauth2.id_token, "fetch_id_token", lambda *_: None)
     with pytest.raises(RuntimeError, match="Failed to fetch IAP token"):
         iap.get_iap_token("fake-audience")
@@ -20,7 +20,7 @@ def test_get_iap_token_failure(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_get_api_client_missing_iap_env(monkeypatch):
-    """Test that get_api_client sets up the client with correct parameters for local."""
+    """Test that get_api_client sets up the client with correct parameters for local with no iap_env."""
     monkeypatch.setenv("URL_ENV", "https://localhost:1234")
     monkeypatch.delenv("IAP_ENV", raising=False)  # Ensure IAP_ENV is not set
     async with iap.get_api_client(url_env="URL_ENV", iap_env="IAP_ENV") as client:
@@ -29,7 +29,7 @@ async def test_get_api_client_missing_iap_env(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_get_api_client_empty_iap_env(monkeypatch):
-    """Test that get_api_client sets up the client with correct parameters for local."""
+    """Test that get_api_client sets up the client with correct parameters for local with empty iap_env."""
     monkeypatch.setenv("URL_ENV", "https://localhost:1234")
     monkeypatch.setenv("IAP_ENV", "")
     async with iap.get_api_client(url_env="URL_ENV", iap_env="IAP_ENV") as client:
