@@ -8,7 +8,7 @@ from fastapi import HTTPException, status
 from httpx import RequestError
 
 from eq_cir_proxy_service.exceptions import exception_messages
-from eq_cir_proxy_service.services.instrument.instrument_conversion import (
+from eq_cir_proxy_service.services.instrument.conversion import (
     convert_instrument,
     safe_parse,
 )
@@ -135,7 +135,7 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
         )
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.instrument_conversion.get_api_client",
+        "eq_cir_proxy_service.services.instrument.conversion.get_api_client",
         dummy_get_api_client,
     )
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
@@ -153,7 +153,7 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
     target_version = "2.0.0"
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.instrument_conversion.get_api_client",
+        "eq_cir_proxy_service.services.instrument.conversion.get_api_client",
         DummyIAPClient(),
     )
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
@@ -196,7 +196,7 @@ def test_safe_parse_valid(monkeypatch):
             """Parses a version string."""
             return f"parsed-{s}"
 
-    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion.Version", DummyVersion)
+    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.conversion.Version", DummyVersion)
 
     result = safe_parse("current", "1.2.3")
     assert result == "parsed-1.2.3"
@@ -223,7 +223,7 @@ def test_safe_parse_invalid_version(version_type, version_value, monkeypatch):
                 return "parsed-valid"
             raise ValueError(error_message)
 
-    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.instrument_conversion.Version", DummyVersion)
+    monkeypatch.setattr("eq_cir_proxy_service.services.instrument.conversion.Version", DummyVersion)
 
     # valid target
     assert safe_parse(version_type, "valid") == "parsed-valid"

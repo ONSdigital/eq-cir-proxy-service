@@ -8,8 +8,8 @@ import httpx
 import pytest
 from fastapi import HTTPException
 
-from eq_cir_proxy_service.services.instrument import instrument_retrieval
-from eq_cir_proxy_service.services.instrument.instrument_retrieval import (
+from eq_cir_proxy_service.services.instrument import retrieval
+from eq_cir_proxy_service.services.instrument.retrieval import (
     retrieve_instrument,
 )
 
@@ -48,7 +48,7 @@ async def test_retrieve_instrument_success(mocker):
 
     # Patch the iap.get_api_client used inside the service
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieval.get_api_client",
         fake_api_client,
     )
 
@@ -110,7 +110,7 @@ async def test_retrieve_instrument_exception(
         yield FakeClient()
 
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieval.get_api_client",
         fake_api_client,
     )
 
@@ -129,7 +129,7 @@ async def test_retrieve_instrument_missing_cir_endpoint(mocker):
     # Patch environment to include CIR_API_BASE_URL but not CIR_RETRIEVE_CI_ENDPOINT
     mocker.patch.dict(os.environ, {"CIR_API_BASE_URL": "http://fake-url", "CIR_RETRIEVE_CI_ENDPOINT": ""}, clear=True)
     with pytest.raises(HTTPException) as exc_info:
-        await instrument_retrieval.retrieve_instrument(instrument_id)
+        await retrieval.retrieve_instrument(instrument_id)
     exc = exc_info.value
     assert exc.status_code == 500
     assert exc.detail["message"] == "CIR_RETRIEVE_CI_ENDPOINT configuration is missing."

@@ -12,7 +12,7 @@ from eq_cir_proxy_service.exceptions.exception_messages import (
     exception_404_missing_instrument_id,
     exception_422_invalid_instrument_id,
 )
-from eq_cir_proxy_service.routers import instrument_router
+from eq_cir_proxy_service.routers import instrument
 
 # Load .env file
 load_dotenv(".env")
@@ -57,4 +57,4 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
     )
 
 
-app.include_router(instrument_router.router)
+app.include_router(instrument.router)

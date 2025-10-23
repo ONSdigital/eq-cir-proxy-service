@@ -6,8 +6,8 @@ import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from eq_cir_proxy_service.routers import instrument_router
-from eq_cir_proxy_service.routers.instrument_router import router
+from eq_cir_proxy_service.routers import instrument as instrument_router
+from eq_cir_proxy_service.routers.instrument import router
 
 # Set up FastAPI test app and client
 app = FastAPI()
@@ -27,7 +27,7 @@ async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
         return mocked_instrument
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval.retrieve_instrument",
+        "eq_cir_proxy_service.services.instrument.retrieval.retrieve_instrument",
         mock_retrieve_instrument,
     )
 
@@ -56,11 +56,11 @@ async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPat
         return converted_instrument
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.instrument_retrieval.retrieve_instrument",
+        "eq_cir_proxy_service.services.instrument.retrieval.retrieve_instrument",
         mock_retrieve_instrument,
     )
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.instrument_conversion.convert_instrument",
+        "eq_cir_proxy_service.services.instrument.conversion.convert_instrument",
         mock_convert_instrument,
     )
 
