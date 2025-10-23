@@ -50,7 +50,5 @@ async def get_api_client(*, url_env: str, iap_env: str) -> AsyncIterator[AsyncCl
         logger.info("No IAP client ID set. Using local API client.")
         client = AsyncClient(base_url=base_url)
 
-    try:
-        yield client
-    finally:
-        await client.aclose()
+    yield client
+    await client.aclose()
