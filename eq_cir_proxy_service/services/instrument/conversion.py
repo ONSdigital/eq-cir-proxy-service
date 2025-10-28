@@ -3,12 +3,13 @@
 import os
 
 from fastapi import HTTPException, status
-from httpx import AsyncClient, RequestError
+from httpx import RequestError
 from semver import Version
 from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.types.custom_types import Instrument
+from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
 
@@ -59,18 +60,8 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
             target_version=target_version,
         )
 
-        converter_service_base_url = os.getenv("CONVERTER_SERVICE_API_BASE_URL")
         converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
 
-        if not converter_service_base_url:
-            logger.error("CONVERTER_SERVICE_API_BASE_URL is not configured.")
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "status": "error",
-                    "message": "CONVERTER_SERVICE_API_BASE_URL configuration is missing.",
-                },
-            )
         if not converter_service_endpoint:
             logger.error("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT is not configured.")
             raise HTTPException(
@@ -81,23 +72,25 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
                 },
             )
 
-        url = f"{converter_service_base_url}{converter_service_endpoint}"
-        try:
-            async with AsyncClient() as client:
-                response = await client.post(
-                    url,
+        async with get_api_client(
+            url_env="CONVERTER_SERVICE_API_BASE_URL",
+            iap_env="CONVERTER_SERVICE_IAP_CLIENT_ID",
+        ) as converter_service_api_client:
+            try:
+                response = await converter_service_api_client.post(
+                    converter_service_endpoint,
                     json={"instrument": instrument},
                     params={"current_version": current_version, "target_version": target_version},
                 )
-        except RequestError as e:
-            logger.exception("Error occurred while converting instrument: ", error=e)
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "status": "error",
-                    "message": "Error connecting to Converter Service.",
-                },
-            ) from e
+            except RequestError as e:
+                logger.exception("Error occurred while converting instrument.", error=e)
+                raise HTTPException(
+                    status_code=500,
+                    detail={
+                        "status": "error",
+                        "message": "Error connecting to Converter Service.",
+                    },
+                ) from e
 
         instrument_data: Instrument = response.json()
         return instrument_data

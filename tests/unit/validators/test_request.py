@@ -3,7 +3,7 @@
 import pytest
 from fastapi import HTTPException
 
-from eq_cir_proxy_service.services.validators.request_validator import validate_version
+from eq_cir_proxy_service.services.validators.request import validate_version
 
 
 @pytest.mark.parametrize(
