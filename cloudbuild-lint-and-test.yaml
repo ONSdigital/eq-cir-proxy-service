@@ -1,18 +1,8 @@
 steps:
   # Run Megalinter to lint the codebase
   - name: "gcr.io/cloud-builders/docker"
-    args:
-      [
-        "run",
-        "--platform",
-        "linux/amd64",
-        "--rm",
-        "-v",
-        "/var/run/docker.sock:/var/run/docker.sock:rw",
-        "-v",
-        "${shell pwd}:/tmp/lint:rw",
-        "ghcr.io/oxsecurity/megalint-python:9.0.1"
-      ]
+    id: "megalinter"
+    args: ["run", "--platform", "linux/amd64", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock:rw", "-v", "${shell pwd}:/tmp/lint:rw", "ghcr.io/oxsecurity/megalint-python:9.0.1"]
 
 timeout: "1800s"
 
