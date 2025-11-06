@@ -1,15 +1,7 @@
 steps:
   # Build the container image
   - name: "gcr.io/cloud-builders/docker"
-    args:
-      [
-        "build",
-        "-t",
-        "${_IMAGE_NAME}:$SHORT_SHA",
-        "-t",
-        "${_IMAGE_NAME}:latest",
-        ".",
-      ]
+    args: ["build", "-t", "${_IMAGE_NAME}:$SHORT_SHA", "-t", "${_IMAGE_NAME}:latest", "."]
 
   # Push the SHORT_SHA image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
