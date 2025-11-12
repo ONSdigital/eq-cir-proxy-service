@@ -10,11 +10,11 @@ steps:
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "${_IMAGE_NAME}:${CLEAN_TAG}", "."]
+    args: ["build", "-t", "${_IMAGE_NAME}:${_CLEAN_TAG}", "."]
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE_NAME}:${CLEAN_TAG}"]
+    args: ["push", "${_IMAGE_NAME}:${_CLEAN_TAG}"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
