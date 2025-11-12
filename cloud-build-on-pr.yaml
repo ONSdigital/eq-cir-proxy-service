@@ -2,6 +2,8 @@ steps:
   # Create a CLEAN_TAG to sanitize BRANCH_NAME
   - name: "ubuntu"
     entrypoint: "bash"
+    env:
+      - "BRANCH_NAME=$BRANCH_NAME"
     args:
       - -c
       - |
@@ -11,14 +13,10 @@ steps:
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
     args: ["build", "-t", "${_IMAGE_NAME}:$(cat /workspace/tag.env | cut -d= -f2", "."]
-    env:
-      - "BRANCH_NAME=$BRANCH_NAME"
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "${_IMAGE_NAME}:$(cat /workspace/tag.env | cut -d= -f2"]
-    env:
-      - "BRANCH_NAME=$BRANCH_NAME"
 
 options:
   logging: CLOUD_LOGGING_ONLY
