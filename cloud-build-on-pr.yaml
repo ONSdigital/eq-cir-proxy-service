@@ -13,7 +13,7 @@ steps:
   - name: docker
     entrypoint: "sh"
     args:
-      - -c
+      - "-c"
       - |
         docker build -t "${_IMAGE_NAME}:$(cat /workspace/tag.txt | cut -d =f2)"
 
