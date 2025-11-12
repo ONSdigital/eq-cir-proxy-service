@@ -10,10 +10,12 @@ steps:
       cat /workspace/tag.txt
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
-  - name: "gcr.io/cloud-builders/docker"
-    env:
-      - 'TAG_NAME=$(cat /workspace/tag.txt | cut -d =f2)'
-    args: ["build", "--build-arg", "TAG_NAME=${TAG_NAME}", "-t", "${_IMAGE_NAME}:${TAG_NAME}", "."]
+  - name: docker
+    entrypoint: "sh"
+    args:
+      - -c
+      - |
+        docker build -t "${_IMAGE_NAME}:$(cat /workspace/tag.txt | cut -d =f2)"
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
