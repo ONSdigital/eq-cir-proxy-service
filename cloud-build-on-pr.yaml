@@ -11,7 +11,7 @@ steps:
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
-    env:
+    substitutions:
       - 'TAG_NAME=test'
     args: ["build", "-t", "${_IMAGE_NAME}:$TAG_NAME", "." ]
     options:
