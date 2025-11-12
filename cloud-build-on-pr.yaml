@@ -8,7 +8,7 @@ steps:
     args: ["push", "${_IMAGE_NAME}:${_CLEAN_TAG}"]
 
 substitutions:
-  _CLEAN_TAG: ${$BRANCH_NAME/[^A-Za-z0-9_.-]/-}
+  _CLEAN_TAG: ${BRANCH_NAME/[^A-Za-z0-9_.-]/-}
 
 options:
   logging: CLOUD_LOGGING_ONLY
