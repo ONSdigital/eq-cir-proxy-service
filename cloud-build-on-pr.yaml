@@ -3,7 +3,7 @@ steps:
   - name: "ubuntu"
     script: |
       #!/usr/bin/env bash
-      echo "Your project ID is $PROJECT_ID"
+      echo "Your project ID is $_PROJECT_ID"
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
