@@ -14,6 +14,8 @@ steps:
     env:
       - 'TAG_NAME=test'
     args: ["build", "-t", "${_IMAGE_NAME}:$TAG_NAME", "." ]
+    options:
+      substitutionOption: 'ALLOW_LOOSE'
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
