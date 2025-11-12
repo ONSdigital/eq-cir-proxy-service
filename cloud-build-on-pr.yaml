@@ -4,16 +4,15 @@ steps:
     script: |
       #!/usr/bin/env bash
       CLEAN_TAG=$(echo "$BRANCH_NAME" | sed 's/[^A-Za-z0-9_.-]/-/g')
-    substitutions:
-    - CLEAN_TAG: $CLEAN_TAG
+      echo "CLEAN_TAG=$CLEAN_TAG"
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "${_IMAGE_NAME}:$CLEAN_TAG", "."]
+    args: ["build", "-t", "${_IMAGE_NAME}:$(cat /workspace/tag.env | cut -d= -f2)", "."]
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE_NAME}:$CLEAN_TAG"]
+    args: ["push", "${_IMAGE_NAME}:$(cat /workspace/tag.env | cut -d= -f2)"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
