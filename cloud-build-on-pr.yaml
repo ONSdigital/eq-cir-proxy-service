@@ -12,7 +12,7 @@ steps:
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE_NAME}:$(cat /workspace/tag.env | cut -d= -f2)"]
+    args: ["push", "${_IMAGE_NAME}:${cat /workspace/tag.env | cut -d= -f2}"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
