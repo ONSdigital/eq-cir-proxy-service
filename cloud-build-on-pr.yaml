@@ -6,7 +6,7 @@ steps:
     script: |
       #!/usr/bin/env bash
       CLEAN_TAG=$(echo $BRANCH_NAME | sed 's/[^A-Za-z0-9_.-]/-/g')
-      echo "CLEAN_TAG=$CLEAN_TAG"
+      echo "CLEAN_TAG=$CLEAN_TAG" >> $BUILD_ENV
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
