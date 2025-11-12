@@ -12,7 +12,7 @@ steps:
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
     env:
-      - "TAG_NAME=$(cat /workspace/tag.txt)"
+      - TAG_NAME=$(cat /workspace/tag.txt)
     args: ["build", "-t", "${_IMAGE_NAME}:$TAG_NAME", "." ]
 
   # Push the image to Google Artifact Registry
