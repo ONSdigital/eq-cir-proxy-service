@@ -1,9 +1,11 @@
 steps:
   # Create a CLEAN_TAG to sanitize BRANCH_NAME
   - name: "ubuntu"
+    env:
+      - "BAR=$PROJECT_ID"
     script: |
       #!/usr/bin/env bash
-      echo "Your project ID is $_PROJECT_ID"
+      echo "Your project ID is $BAR"
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
   - name: "gcr.io/cloud-builders/docker"
