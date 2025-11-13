@@ -10,7 +10,7 @@ steps:
       cat /workspace/tag.txt
 
   # Build the container image using the sanitized CLEAN_TAG as the tag
-  - name: docker
+  - name: "gcr.io/cloud-builders/docker"
     entrypoint: "sh"
     args:
       - "-c"
