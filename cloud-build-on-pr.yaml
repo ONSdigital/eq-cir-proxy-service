@@ -8,13 +8,21 @@ steps:
       CLEAN_TAG=$(echo $BRANCH_NAME | sed 's/[^A-Za-z0-9_.-]/-/g')
       echo "$CLEAN_TAG" >> /workspace/tag.txt
 
-  # Build the container image using the BRANCH_NAME as the tag
-  - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "${_IMAGE_NAME}:", "echo '$(</workspace/tag.txt)'", "."]
+  # Build the container image using the sanitized CLEAN_TAG as the tag
+  - name: "docker"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        docker build -t "$_IMAGE_NAME:$(cat /workspace/tag.txt)" .
 
-  # Push the BRANCH_NAME image to Google Artifact Registry
+  # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE_NAME}:$BRANCH_NAME"]
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        docker push "$_IMAGE_NAME:$(cat /workspace/tag.txt)"
 
 options:
   logging: CLOUD_LOGGING_ONLY
