@@ -15,7 +15,7 @@ steps:
     args:
       - "-c"
       - |
-        docker build -t "$_IMAGE_NAME:$(cat cat /workspace/tag.txt)" .
+        docker build -t "$_IMAGE_NAME:$(cat /workspace/tag.txt)" .
 
   # Push the image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
