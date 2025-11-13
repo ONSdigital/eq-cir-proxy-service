@@ -12,6 +12,9 @@ updates:
 
     directory: /
 
+    pull-request-branch-name:
+      separator: "-"
+
     # Allows separate configs to be assigned for the same ecosystem
     target-branch: main
 
@@ -39,6 +42,9 @@ updates:
 
     directory: /
 
+    pull-request-branch-name:
+      separator: "-"
+
     schedule:
       interval: "monthly"
       day: "monday"
@@ -62,6 +68,9 @@ updates:
 
     # Look for a pyproject.toml/requirements.txt/Pipfile.lock in the root directory
     directory: /
+
+    pull-request-branch-name:
+      separator: "-"
 
     versioning-strategy: increase
 
@@ -89,6 +98,9 @@ updates:
     open-pull-requests-limit: 10
 
     directory: /
+
+    pull-request-branch-name:
+      separator: "-"
 
     versioning-strategy: increase
 
