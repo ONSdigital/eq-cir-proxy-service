@@ -1,15 +1,23 @@
 steps:
-  # Build the container image using the SHORT_SHA as the tag
+  # Build the container image using the SHORT_SHA and "dev-image" as the tag
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "${_IMAGE_NAME}:$SHORT_SHA", "-t", "${_IMAGE_NAME}:dev_image", "."]
+    args:
+      [
+        "build",
+        "-t",
+        "${_IMAGE_NAME}:$SHORT_SHA",
+        "-t",
+        "${_IMAGE_NAME}:dev-image",
+        ".",
+      ]
 
   # Push the SHORT_SHA image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "${_IMAGE_NAME}:$SHORT_SHA"]
 
-  # Push the SHORT_SHA image to Google Artifact Registry
+  # Push the "dev-image" image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: [ "push", "${_IMAGE_NAME}:dev_image" ]
+    args: ["push", "${_IMAGE_NAME}:dev-image"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
