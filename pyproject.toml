@@ -24,7 +24,7 @@ requests = "^2.32.5"
 [tool.poetry.group.dev.dependencies]
 # :TODO: Remove pylint when ruff supports all pylint rules
 # :TODO: Remove black when ruff supports all black rules
-pylint = "^3.3.8"
+pylint = "^4.0.3"
 black = "^25.9.0"
 pytest = "^8.4.2"
 pytest-xdist = "^3.8.0"
