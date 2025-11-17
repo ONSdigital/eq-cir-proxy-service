@@ -29,6 +29,14 @@ async def root() -> dict:
     return {"message": "Hello World"}
 
 
+@app.get("/status")
+async def health_check() -> dict:
+    """Health check endpoint for Cloud Run."""
+
+    logger.info("Health check endpoint.")
+    return {"status": "OK"}
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Custom exception handler for validation errors, to allow logging of any errors."""
