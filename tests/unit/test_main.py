@@ -14,6 +14,14 @@ def test_root():
     assert response.json() == {"message": "Hello World"}
 
 
+def test_status_endpoint(client=None):
+    """Test the GET /status endpoint."""
+    client = client or TestClient(app)
+    response = client.get("/status")
+    assert response.status_code == 200
+    assert response.json() == {"status": "OK"}
+
+
 def test_validation_exception_handler(client=None):
     """Test that a non-UUID parameter returns a 422 response."""
     client = client or TestClient(app)
