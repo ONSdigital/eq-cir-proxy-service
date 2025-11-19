@@ -1,4 +1,4 @@
-"""This module retrieves the instrument from CIR using the instrument_id."""
+"""This module retrieves the instrument metadata from CIR using the instrument_id."""
 
 import os
 from uuid import UUID
@@ -8,18 +8,18 @@ from httpx import RequestError
 from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions.exception_messages import (
-    EXCEPTION_404_INSTRUMENT_NOT_FOUND,
-    EXCEPTION_500_INSTRUMENT_PROCESSING,
+    EXCEPTION_404_INSTRUMENT_METADATA_NOT_FOUND,
+    EXCEPTION_500_INSTRUMENT_METADATA_PROCESSING,
 )
-from eq_cir_proxy_service.types.custom_types import Instrument
+from eq_cir_proxy_service.types.custom_types import InstrumentMetadata
 from eq_cir_proxy_service.utils.check_endpoint import check_endpoint_configured
 from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
 
 
-async def retrieve_instrument(instrument_id: UUID) -> Instrument:
-    """Retrieves the instrument from CIR.
+async def retrieve_instrument_metadata(instrument_id: UUID) -> InstrumentMetadata:
+    """Retrieves the instrument metadata from CIR.
 
     Parameters:
     - instrument_id: The ID of the instrument.
@@ -27,14 +27,14 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     Returns:
     - Instrument: The retrieved instrument.
     """
-    logger.debug("Retrieving instrument from CIR...", instrument_id=instrument_id)
+    logger.debug("Retrieving instrument metadata from CIR...", instrument_id=instrument_id)
 
-    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_ENDPOINT", "/v2/retrieve_collection_instrument")
+    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_METADATA_ENDPOINT", "/v3/ci-metadata")
 
     check_endpoint_configured(
         endpoint=cir_endpoint,
-        endpoint_name="CIR_RETRIEVE_CI_ENDPOINT",
-        endpoint_error_message="CIR_RETRIEVE_CI_ENDPOINT configuration is missing.",
+        endpoint_name="CIR_RETRIEVE_CI_METADATA_ENDPOINT",
+        endpoint_error_message="CIR_RETRIEVE_CI_METADATA_ENDPOINT configuration is missing.",
     )
 
     async with get_api_client(
@@ -44,7 +44,7 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
         try:
             response = await cir_api_client.get(cir_endpoint, params={"guid": str(instrument_id)})
         except RequestError as e:
-            logger.exception("Error occurred while retrieving instrument.", error=e)
+            logger.exception("Error occurred while retrieving instrument metadata.", error=e)
             raise HTTPException(
                 status_code=500,
                 detail={
@@ -54,22 +54,26 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
             ) from e
 
     if response.status_code == 200:
-        logger.info("Instrument retrieved successfully.", instrument_id=instrument_id)
-        instrument_data: Instrument = response.json()
+        logger.info("Instrument metadata retrieved successfully.", instrument_id=instrument_id)
+        instrument_data: InstrumentMetadata = response.json()
         return instrument_data
 
     if response.status_code == 404:
-        logger.error("Instrument not found. Response: ", instrument_id=instrument_id, response_text=response.text)
+        logger.error(
+            "Instrument metadata not found. Response: ",
+            instrument_id=instrument_id,
+            response_text=response.text,
+        )
         raise HTTPException(
             status_code=404,
             detail={
                 "status": "error",
-                "message": EXCEPTION_404_INSTRUMENT_NOT_FOUND,
+                "message": EXCEPTION_404_INSTRUMENT_METADATA_NOT_FOUND,
             },
         )
 
     logger.error(
-        "Failed to retrieve instrument.",
+        "Failed to retrieve instrument metadata.",
         instrument_id=instrument_id,
         status=response.status_code,
         response_text=response.text,
@@ -78,6 +82,6 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
         status_code=500,
         detail={
             "status": "error",
-            "message": EXCEPTION_500_INSTRUMENT_PROCESSING,
+            "message": EXCEPTION_500_INSTRUMENT_METADATA_PROCESSING,
         },
     )

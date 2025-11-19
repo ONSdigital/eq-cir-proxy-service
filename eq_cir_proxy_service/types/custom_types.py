@@ -2,3 +2,6 @@
 
 # Define the type for the instrument
 Instrument = dict[str, bool | int | str | list | object]
+
+# Define the type for the instrument
+InstrumentMetadata = list[dict[str, bool | int | str]]
