@@ -12,7 +12,7 @@ steps:
 
   # Install development dependencies and run test
   - name: "ubuntu"
-    id: install-dev-dependencies-and-run-test
+    id: make-install-dependencies-and-test
     entrypoint: "sh"
     args:
       - "-c"
