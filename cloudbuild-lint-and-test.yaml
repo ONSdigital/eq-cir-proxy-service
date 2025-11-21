@@ -11,18 +11,14 @@ steps:
     args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
 
   # Install development dependencies
-  - name: "ubuntu"
+  - name: "bash"
     id: install-dev-dependencies
-    script: |
-      #!/usr/bin/env bash
-      make install-dev
+    args: ["make", "install-dev"]
 
   # Run tests
-  - name: "ubuntu"
+  - name: "bash"
     id: run-proxy-tests
-    script: |
-      #!/usr/bin/env bash
-      make test
+    args: ["make", "test"]
 
 timeout: "1800s"
 
