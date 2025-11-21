@@ -10,15 +10,15 @@ steps:
     entrypoint: "pip"
     args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
 
-  # Install development dependencies
-  - name: "bash"
-    id: install-dev-dependencies
-    args: ["make", "install-dev"]
-
-  # Run tests
-  - name: "bash"
-    id: run-proxy-tests
-    args: ["make", "test"]
+  # Install development dependencies and run test
+  - name: "ubuntu"
+    id: install-dev-dependencies-and-run-test
+    entrypoint: "bash"
+    args:
+      - "c"
+      - |
+        make install-dev
+        make test
 
 timeout: "1800s"
 
