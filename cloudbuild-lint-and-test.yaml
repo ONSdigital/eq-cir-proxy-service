@@ -15,7 +15,7 @@ steps:
     id: install-dev-dependencies-and-run-test
     entrypoint: "sh"
     args:
-      - "c"
+      - "-c"
       - |
         make install-dev
         make test
