@@ -6,17 +6,23 @@ steps:
 
   # Install Pip and Poetry
   - name: "python:3.12.6"
-    id: test_proxy_service
+    id: install-pip-and-poetry
     entrypoint: "pip"
     args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
 
   # Install development dependencies
-  - name: "bash"
-    args: ["make", "install-dev"]
+  - name: "ubuntu"
+    id: install-dev-dependencies
+    script: |
+      #!/usr/bin/env bash
+      make install-dev
 
   # Run tests
-  - name: "bash"
-    args: ["make", "test"]
+  - name: "ubuntu"
+    id: run-proxy-tests
+    script: |
+      #!/usr/bin/env bash
+      make test
 
 timeout: "1800s"
 
