@@ -4,6 +4,20 @@ steps:
     id: "megalinter"
     args: ["run", "--platform", "linux/amd64", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock:rw", "-v", "/workspace:/tmp/lint:rw", "ghcr.io/oxsecurity/megalinter-python:v9.1.0"]
 
+  # Install Pip and Poetry
+  - name: "python:3.12.6"
+    id: test_proxy_service
+    entrypoint: "pip"
+    args: ["install",  "--upgrade", "pip", "poetry==2.1.2"]
+
+  # Install development dependencies
+  - name: "bash"
+    args: ["make", "install-dev"]
+
+  # Run tests
+  - name: "bash"
+    args: [ "make", "test" ]
+
 timeout: "1800s"
 
 options:
