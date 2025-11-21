@@ -8,7 +8,7 @@ steps:
   - name: "python:3.12.6"
     id: test_proxy_service
     entrypoint: "pip"
-    args: ["install",  "--upgrade", "pip", "poetry==2.1.2"]
+    args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
 
   # Install development dependencies
   - name: "bash"
@@ -16,7 +16,7 @@ steps:
 
   # Run tests
   - name: "bash"
-    args: [ "make", "test" ]
+    args: ["make", "test"]
 
 timeout: "1800s"
 
