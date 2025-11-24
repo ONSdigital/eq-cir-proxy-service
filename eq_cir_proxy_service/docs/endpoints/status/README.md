@@ -1,6 +1,6 @@
 # GET /status
 
-The /status endpoint provides a simple health check used by Cloud Run to verify that the proxy Service is running and able to respond to requests.
+The /status endpoint provides a simple health check used by Cloud Run to verify that the Proxy Service is running and able to respond to requests.
 
 The endpoint does not require any parameters and returns a small JSON response confirming the service is running.
 
