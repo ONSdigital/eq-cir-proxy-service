@@ -11,11 +11,13 @@ steps:
     args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
 
   # Install development dependencies and run test
-  - name: "bash"
+  - name: "ubuntu"
     id: make-install-dependencies-and-test
+    entrypoint: "bash"
     args:
       - "-c"
       - |
+        apt install make
         make install-dev
         make test
 
