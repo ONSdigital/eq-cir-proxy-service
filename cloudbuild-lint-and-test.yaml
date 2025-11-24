@@ -13,14 +13,8 @@ steps:
       - |
         echo "****     Installing Poetry and dependencies     ****"
         pip install --upgrade pip poetry==2.1.2
-
-  - name: python:3.12.6
-    id: "run"
-    entrypoint: "sh"
-    args:
-      - "-c"
-      - |
         make install-dev
+        echo "****     Running Tests     ****"
         make test
 
 timeout: "1800s"
