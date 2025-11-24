@@ -4,21 +4,17 @@ steps:
     id: "megalinter"
     args: ["run", "--platform", "linux/amd64", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock:rw", "-v", "/workspace:/tmp/lint:rw", "ghcr.io/oxsecurity/megalinter-python:v9.1.0"]
 
-  # Install Pip and Poetry
-  - name: "python:3.12.6"
-    id: install-pip-and-poetry
-    entrypoint: "pip"
-    args: ["install", "--upgrade", "pip", "poetry==2.1.2"]
-
-  # Install development dependencies and run test
-  - name: "ubuntu"
-    id: make-install-dependencies-and-test
-    entrypoint: "bash"
+  # Install dependencies and run tests
+  - name: python:3.12.6
+    id: "testing"
+    entrypoint: "sh"
     args:
       - "-c"
       - |
-        apt install make
+        echo "****     Installing Poetry and dependencies     ****"
+        pip install --upgrade pip poetry==2.1.2
         make install-dev
+        echo "****     Running Tests     ****"
         make test
 
 timeout: "1800s"
