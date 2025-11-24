@@ -1,20 +1,24 @@
 steps:
   # Run Megalinter to lint the codebase
   - name: "gcr.io/cloud-builders/docker"
-    id: "megalinter"
+    id: "megalint"
     args: ["run", "--platform", "linux/amd64", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock:rw", "-v", "/workspace:/tmp/lint:rw", "ghcr.io/oxsecurity/megalinter-python:v9.1.0"]
 
   # Install dependencies and run tests
   - name: python:3.12.6
-    id: "testing"
+    id: "test"
     entrypoint: "sh"
     args:
       - "-c"
       - |
-        echo "****     Installing Poetry and dependencies     ****"
+        echo "********************************************************"
+        echo "* Installing dependencies                              *"
+        echo "********************************************************"
         pip install --upgrade pip poetry==2.1.2
         make install-dev
-        echo "****     Running Tests     ****"
+        echo "********************************************************"
+        echo "* Running tests                                        *"
+        echo "********************************************************"
         make test
 
 timeout: "1800s"
