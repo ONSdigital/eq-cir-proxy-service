@@ -23,7 +23,6 @@ steps:
         make install-dev
         make test
 
-
 timeout: "1800s"
 
 options:
