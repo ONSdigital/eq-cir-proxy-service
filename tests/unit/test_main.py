@@ -1,6 +1,7 @@
 """Tests for the main application module."""
 
 from fastapi.testclient import TestClient
+import pytest
 
 from eq_cir_proxy_service.main import app
 
@@ -20,6 +21,13 @@ def test_status_endpoint(client=None):
     response = client.get("/status")
     assert response.status_code == 200
     assert response.json() == {"status": "OK"}
+
+@pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
+def test_status_unsupported_method(method, client=None):
+    """Test that unsupported methods on /status return 405."""
+    client = client or TestClient(app)
+    response = client.request(method, "/status")
+    assert response.status_code == 405
 
 
 def test_validation_exception_handler(client=None):
