@@ -31,7 +31,12 @@ async def root() -> dict:
 
 @app.get("/status")
 async def health_check() -> dict:
-    """Health check endpoint for Cloud Run."""
+    """Health check endpoint for Cloud Run.
+
+    Returns:
+        dict: A JSON object indicating the service is running.
+        Example: {"status": "OK"}
+    """
     logger.info("Health check endpoint.")
     return {"status": "OK"}
 
