@@ -5,7 +5,7 @@ steps:
 
   # Push the SHORT_SHA & latest image to Google Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE_NAME}",  "--all-tags"]
+    args: ["push", "${_IMAGE_NAME}", "--all-tags"]
 
   # Deploy the container to Google Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
