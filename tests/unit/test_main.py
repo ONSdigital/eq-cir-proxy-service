@@ -1,5 +1,6 @@
 """Tests for the main application module."""
 
+import pytest
 from fastapi.testclient import TestClient
 
 from eq_cir_proxy_service.main import app
@@ -12,6 +13,24 @@ def test_root():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello World"}
+
+
+def test_status_endpoint_with_logs(caplog, client=None):
+    """Test the GET /status endpoint and log output."""
+    client = client or TestClient(app)
+    with caplog.at_level("INFO"):
+        response = client.get("/status")
+    assert response.status_code == 200
+    assert response.json() == {"status": "OK"}
+    assert "Health check endpoint." in caplog.text
+
+
+@pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
+def test_status_unsupported_method(method, client=None):
+    """Test that unsupported methods on /status return 405."""
+    client = client or TestClient(app)
+    response = client.request(method, "/status")
+    assert response.status_code == 405
 
 
 def test_validation_exception_handler(client=None):
