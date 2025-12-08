@@ -7,8 +7,7 @@ permissions:
   contents: read
   actions: read
 
-# Trigger mega-linter at every push. Action will also be visible from
-# Pull Requests to main
+# Trigger megalinter on every pull request to main
 on: # yamllint disable-line rule:truthy
   pull_request:
     branches: [main]
@@ -71,11 +70,7 @@ jobs:
           #     github.event_name == 'push' &&
           #     github.ref == 'refs/heads/main'
           #   }}
-          VALIDATE_ALL_CODEBASE: >-
-            ${{
-              github.event_name == 'push' &&
-              github.ref == 'refs/heads/main'
-            }}
+          VALIDATE_ALL_CODEBASE: true
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
