@@ -8,6 +8,7 @@ from structlog import get_logger
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.services.instrument import (
     conversion,
+    metadata,
     retrieval,
 )
 from eq_cir_proxy_service.services.validators.request import (
@@ -37,7 +38,9 @@ async def get_instrument_by_uuid(
 
         instrument = await retrieval.retrieve_instrument(instrument_id)
 
-        return await conversion.convert_instrument(instrument, target_version)
+        instrument_metadata = await metadata.retrieve_instrument_metadata(instrument_id)
+
+        return await conversion.convert_instrument(instrument, instrument_metadata, target_version)
 
     except HTTPException:
         raise  # re-raise so FastAPI handles it properly

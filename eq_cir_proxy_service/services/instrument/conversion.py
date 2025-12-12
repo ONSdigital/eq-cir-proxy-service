@@ -8,7 +8,8 @@ from semver import Version
 from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions import exception_messages
-from eq_cir_proxy_service.types.custom_types import Instrument
+from eq_cir_proxy_service.types.custom_types import Instrument, InstrumentMetadata
+from eq_cir_proxy_service.utils.check_endpoint import check_endpoint_configured
 from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
@@ -31,25 +32,35 @@ def safe_parse(source: str, version: str) -> Version:
         ) from e
 
 
-async def convert_instrument(instrument: Instrument, target_version: str) -> Instrument:
+async def convert_instrument(
+    instrument: Instrument,
+    instrument_metadata: InstrumentMetadata,
+    target_version: str,
+) -> Instrument:
     """Requests conversion of the instrument from Converter Service.
 
     Parameters:
     - instrument: The instrument.
-    - current_version: The current version of the instrument.
+    - instrument_metadata: The instrument metadata.
     - target_version: The target version of the instrument.
 
     Returns:
     - dict: The converted instrument.
     """
-    if not instrument.get("validator_version"):
+    # instrument_metadata is a list of dicts; get validator_version from the first item
+    if (
+        not instrument_metadata
+        or not isinstance(instrument_metadata, dict)
+        or not instrument_metadata.get("validator_version")
+    ):
         logger.error("Instrument version is missing")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
         )
+    instrument_validator_version = instrument_metadata.get("validator_version")
 
-    current_version = str(instrument["validator_version"])
+    current_version = str(instrument_validator_version)
     parsed_current_version = safe_parse("current", current_version)
     parsed_target_version = safe_parse("target", target_version)
 
@@ -62,15 +73,11 @@ async def convert_instrument(instrument: Instrument, target_version: str) -> Ins
 
         converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
 
-        if not converter_service_endpoint:
-            logger.error("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT is not configured.")
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "status": "error",
-                    "message": "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing.",
-                },
-            )
+        check_endpoint_configured(
+            endpoint=converter_service_endpoint,
+            endpoint_name="CONVERTER_SERVICE_CONVERT_CI_ENDPOINT",
+            endpoint_error_message="CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing.",
+        )
 
         async with get_api_client(
             url_env="CONVERTER_SERVICE_API_BASE_URL",

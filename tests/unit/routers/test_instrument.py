@@ -20,7 +20,7 @@ async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
     """Should return 422 error when version is not provided."""
     instrument_id = uuid4()
     mocked_instrument = {
-        "validator_version": "1.0.0",
+        "form_type": "9999",
     }
 
     async def mock_retrieve_instrument(_instrument_id):
@@ -41,8 +41,11 @@ async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPat
     instrument_id = uuid4()
     version = "2.0.0"
     mocked_instrument = {
-        "validator_version": "1.0.0",
+        "form_type": "9999",
     }
+    mocked_instrument_metadata = [
+        {"validator_version": "1.0.0"},
+    ]
     converted_instrument = {
         "validator_version": version,
     }
@@ -50,14 +53,22 @@ async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPat
     async def mock_retrieve_instrument(_instrument_id):
         return mocked_instrument
 
-    async def mock_convert_instrument(instrument, target_version):
+    async def mock_retrieve_instrument_metadata(_instrument_id):
+        return mocked_instrument_metadata
+
+    async def mock_convert_instrument(instrument, instrument_metadata, target_version):
         assert instrument == mocked_instrument
+        assert instrument_metadata == mocked_instrument_metadata
         assert target_version == version
         return converted_instrument
 
     monkeypatch.setattr(
         "eq_cir_proxy_service.services.instrument.retrieval.retrieve_instrument",
         mock_retrieve_instrument,
+    )
+    monkeypatch.setattr(
+        "eq_cir_proxy_service.services.instrument.metadata.retrieve_instrument_metadata",
+        mock_retrieve_instrument_metadata,
     )
     monkeypatch.setattr(
         "eq_cir_proxy_service.services.instrument.conversion.convert_instrument",
