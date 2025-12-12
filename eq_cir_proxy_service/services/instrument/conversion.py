@@ -50,15 +50,15 @@ async def convert_instrument(
     # instrument_metadata is a list of dicts; get validator_version from the first item
     if (
         not instrument_metadata
-        or not isinstance(instrument_metadata[0], dict)
-        or not instrument_metadata[0].get("validator_version")
+        or not isinstance(instrument_metadata, dict)
+        or not instrument_metadata.get("validator_version")
     ):
         logger.error("Instrument version is missing")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
         )
-    instrument_validator_version = instrument_metadata[0]["validator_version"]
+    instrument_validator_version = instrument_metadata.get("validator_version")
 
     current_version = str(instrument_validator_version)
     parsed_current_version = safe_parse("current", current_version)

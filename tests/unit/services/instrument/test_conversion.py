@@ -36,7 +36,7 @@ class DummyAsyncClient:
     """Dummy async client for testing."""
 
     expected_instrument: dict
-    expected_instrument_metadata: list
+    expected_instrument_metadata: dict
     expected_response: dict
     target_version: str
 
@@ -52,7 +52,7 @@ class DummyAsyncClient:
         assert url == "/convert"
         assert kwargs["json"] == {"instrument": self.expected_instrument}
         assert kwargs["params"] == {
-            "current_version": self.expected_instrument_metadata[0]["validator_version"],
+            "current_version": self.expected_instrument_metadata.get("validator_version"),
             "target_version": self.target_version,
         }
         return DummyResponse(self.expected_response)
@@ -85,7 +85,7 @@ async def test_convert_instrument_missing_version(caplog):
     """Should raise 404 if validator_version is missing."""
     caplog.set_level("INFO")
     instrument = {"id": "123", "sections": []}  # no validator_version
-    instrument_metadata = [{}]
+    instrument_metadata = {}
 
     with pytest.raises(HTTPException) as excinfo:
         await convert_instrument(instrument, instrument_metadata, "1.0.0")
@@ -102,7 +102,7 @@ async def test_convert_instrument_same_version(caplog):
     """Should return the same instrument if versions match."""
     caplog.set_level("INFO")
     instrument = {"id": "123", "sections": []}
-    instrument_metadata = [{"validator_version": "1.0.0"}]
+    instrument_metadata = {"validator_version": "1.0.0"}
     result = await convert_instrument(instrument, instrument_metadata, "1.0.0")
     assert result == instrument
     assert any(
@@ -115,7 +115,7 @@ async def test_convert_instrument_same_version(caplog):
 async def test_convert_instrument_higher_version():
     """Should raise 400 if instrument version > target version."""
     instrument = {"id": "123", "sections": []}
-    instrument_metadata = [{"validator_version": "2.0.0"}]
+    instrument_metadata = {"validator_version": "2.0.0"}
 
     with pytest.raises(HTTPException) as excinfo:
         await convert_instrument(instrument, instrument_metadata, "1.0.0")
@@ -128,7 +128,7 @@ async def test_convert_instrument_higher_version():
 async def test_convert_instrument_lower_version_success(monkeypatch):
     """Should call Converter Service and return converted instrument if instrument version < target version."""
     instrument = {"id": "123", "sections": []}
-    instrument_metadata = [{"validator_version": "1.0.0"}]
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
     fake_response_data = {"id": "123", "sections": []}
 
@@ -156,7 +156,7 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
 async def test_convert_instrument_request_error_with_iap(monkeypatch):
     """Should raise 500 if Converter Service request fails (IAP client version)."""
     instrument = {"id": "123", "sections": []}
-    instrument_metadata = [{"validator_version": "1.0.0"}]
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
 
     monkeypatch.setattr(
@@ -178,7 +178,7 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
 async def test_retrieve_instrument_missing_converter_endpoint(mocker):
     """Test convert_instrument raises HTTPException if CONVERTER_SERVICE_CONVERT_CI_ENDPOINT exists but has no value."""
     instrument = {"id": "123", "sections": []}
-    instrument_metadata = [{"validator_version": "1.0.0"}]
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
     # Patch environment to include CONVERTER_SERVICE_API_BASE_URL but not CONVERTER_SERVICE_CONVERT_CI_ENDPOINT
     mocker.patch.dict(
