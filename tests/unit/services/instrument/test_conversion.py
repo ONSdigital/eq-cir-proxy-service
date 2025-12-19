@@ -36,6 +36,7 @@ class DummyAsyncClient:
     """Dummy async client for testing."""
 
     expected_instrument: dict
+    expected_instrument_metadata: dict
     expected_response: dict
     target_version: str
 
@@ -51,7 +52,7 @@ class DummyAsyncClient:
         assert url == "/convert"
         assert kwargs["json"] == {"instrument": self.expected_instrument}
         assert kwargs["params"] == {
-            "current_version": self.expected_instrument["validator_version"],
+            "current_version": self.expected_instrument_metadata.get("validator_version"),
             "target_version": self.target_version,
         }
         return DummyResponse(self.expected_response)
@@ -84,9 +85,10 @@ async def test_convert_instrument_missing_version(caplog):
     """Should raise 404 if validator_version is missing."""
     caplog.set_level("INFO")
     instrument = {"id": "123", "sections": []}  # no validator_version
+    instrument_metadata = {}
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, "1.0.0")
+        await convert_instrument(instrument, instrument_metadata, "1.0.0")
 
     assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
@@ -99,8 +101,9 @@ async def test_convert_instrument_missing_version(caplog):
 async def test_convert_instrument_same_version(caplog):
     """Should return the same instrument if versions match."""
     caplog.set_level("INFO")
-    instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
-    result = await convert_instrument(instrument, "1.0.0")
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {"validator_version": "1.0.0"}
+    result = await convert_instrument(instrument, instrument_metadata, "1.0.0")
     assert result == instrument
     assert any(
         record.levelname == "INFO" and "Instrument version matches the target" in record.message
@@ -111,10 +114,11 @@ async def test_convert_instrument_same_version(caplog):
 @pytest.mark.asyncio
 async def test_convert_instrument_higher_version():
     """Should raise 400 if instrument version > target version."""
-    instrument = {"id": "123", "validator_version": "2.0.0", "sections": []}
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {"validator_version": "2.0.0"}
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, "1.0.0")
+        await convert_instrument(instrument, instrument_metadata, "1.0.0")
 
     assert excinfo.value.status_code == status.HTTP_400_BAD_REQUEST
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_CONVERSION
@@ -123,13 +127,15 @@ async def test_convert_instrument_higher_version():
 @pytest.mark.asyncio
 async def test_convert_instrument_lower_version_success(monkeypatch):
     """Should call Converter Service and return converted instrument if instrument version < target version."""
-    instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
-    fake_response_data = {"id": "123", "validator_version": "2.0.0"}
+    fake_response_data = {"id": "123", "sections": []}
 
     def dummy_get_api_client(*_args, **_kwargs):
         return DummyAsyncClient(
             expected_instrument=instrument,
+            expected_instrument_metadata=instrument_metadata,
             expected_response=fake_response_data,
             target_version=target_version,
         )
@@ -141,7 +147,7 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
     monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", FAKE_CONVERT_ENDPOINT)
 
-    result = await convert_instrument(instrument, target_version)
+    result = await convert_instrument(instrument, instrument_metadata, target_version)
 
     assert result == fake_response_data
 
@@ -149,7 +155,8 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
 @pytest.mark.asyncio
 async def test_convert_instrument_request_error_with_iap(monkeypatch):
     """Should raise 500 if Converter Service request fails (IAP client version)."""
-    instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
 
     monkeypatch.setattr(
@@ -161,7 +168,7 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
     monkeypatch.setenv("CONVERTER_SERVICE_IAP_CLIENT_ID", "dummy-client-id")
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, target_version)
+        await convert_instrument(instrument, instrument_metadata, target_version)
 
     assert excinfo.value.status_code == 500
     assert excinfo.value.detail["message"] == "Error connecting to Converter Service."
@@ -170,7 +177,8 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
 @pytest.mark.asyncio
 async def test_retrieve_instrument_missing_converter_endpoint(mocker):
     """Test convert_instrument raises HTTPException if CONVERTER_SERVICE_CONVERT_CI_ENDPOINT exists but has no value."""
-    instrument = {"id": "123", "validator_version": "1.0.0", "sections": []}
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {"validator_version": "1.0.0"}
     target_version = "2.0.0"
     # Patch environment to include CONVERTER_SERVICE_API_BASE_URL but not CONVERTER_SERVICE_CONVERT_CI_ENDPOINT
     mocker.patch.dict(
@@ -179,7 +187,7 @@ async def test_retrieve_instrument_missing_converter_endpoint(mocker):
         clear=True,
     )
     with pytest.raises(HTTPException) as exc_info:
-        await convert_instrument(instrument, target_version)
+        await convert_instrument(instrument, instrument_metadata, target_version)
     exc = exc_info.value
     assert exc.status_code == 500
     assert exc.detail["message"] == "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing."
