@@ -47,7 +47,6 @@ async def convert_instrument(
     Returns:
     - dict: The converted instrument.
     """
-    # instrument_metadata is a list of dicts; get validator_version from the first item
     if (
         not instrument_metadata
         or not isinstance(instrument_metadata, dict)
