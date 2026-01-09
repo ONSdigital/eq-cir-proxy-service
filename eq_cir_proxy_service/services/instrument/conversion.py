@@ -59,7 +59,7 @@ async def convert_instrument(
         )
     instrument_validator_version = instrument_metadata.get("validator_version")
 
-    current_version = instrument_validator_version
+    current_version = str(instrument_validator_version)
     parsed_current_version = safe_parse("current", current_version)
     parsed_target_version = safe_parse("target", target_version)
 
