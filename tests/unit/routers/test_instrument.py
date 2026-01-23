@@ -27,7 +27,7 @@ async def test_get_instrument_by_uuid_success(monkeypatch: pytest.MonkeyPatch):
         return mocked_instrument
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.retrieval.retrieve_instrument",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument.retrieve_instrument",
         mock_retrieve_instrument,
     )
 
@@ -63,15 +63,15 @@ async def test_get_instrument_by_uuid_with_version(monkeypatch: pytest.MonkeyPat
         return converted_instrument
 
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.retrieval.retrieve_instrument",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument.retrieve_instrument",
         mock_retrieve_instrument,
     )
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.metadata.retrieve_instrument_metadata",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument_metadata.retrieve_instrument_metadata",
         mock_retrieve_instrument_metadata,
     )
     monkeypatch.setattr(
-        "eq_cir_proxy_service.services.instrument.conversion.convert_instrument",
+        "eq_cir_proxy_service.services.instrument.convert_instrument.convert_instrument",
         mock_convert_instrument,
     )
 

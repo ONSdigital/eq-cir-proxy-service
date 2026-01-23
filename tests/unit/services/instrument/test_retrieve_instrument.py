@@ -6,8 +6,7 @@ from uuid import uuid4
 import httpx
 import pytest
 
-from eq_cir_proxy_service.services.instrument import retrieval
-from eq_cir_proxy_service.services.instrument.retrieval import (
+from eq_cir_proxy_service.services.instrument.retrieve_instrument import (
     retrieve_instrument,
 )
 from tests.unit.conftest import (
@@ -36,7 +35,7 @@ async def test_retrieve_instrument_success(mocker):
 
     # Patch the iap.get_api_client used inside the service
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.retrieval.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument.get_api_client",
         get_fake_api_client(mock_get),
     )
 
@@ -58,7 +57,7 @@ async def test_retrieve_instrument_exception(status_code, text_data, side_effect
     instrument_id = uuid4()
     await run_exception_test(
         mocker,
-        "eq_cir_proxy_service.services.instrument.retrieval.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument.get_api_client",
         retrieve_instrument,
         instrument_id,
         status_code,
@@ -74,7 +73,7 @@ async def test_retrieve_instrument_missing_cir_endpoint(mocker):
     instrument_id = uuid4()
     await run_missing_endpoint_test(
         mocker,
-        retrieval.retrieve_instrument,
+        retrieve_instrument,
         instrument_id,
         {"CIR_API_BASE_URL": "http://fake-url", "CIR_RETRIEVE_CI_ENDPOINT": ""},
         "CIR_RETRIEVE_CI_ENDPOINT configuration is missing.",

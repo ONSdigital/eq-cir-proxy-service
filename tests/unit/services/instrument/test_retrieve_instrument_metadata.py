@@ -6,8 +6,7 @@ from uuid import uuid4
 import httpx
 import pytest
 
-from eq_cir_proxy_service.services.instrument import metadata
-from eq_cir_proxy_service.services.instrument.metadata import (
+from eq_cir_proxy_service.services.instrument.retrieve_instrument_metadata import (
     retrieve_instrument_metadata,
 )
 from tests.unit.conftest import (
@@ -35,7 +34,7 @@ async def test_retrieve_instrument_metadata_success(mocker):
         return mock_response
 
     mocker.patch(
-        "eq_cir_proxy_service.services.instrument.metadata.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument_metadata.get_api_client",
         get_fake_api_client(mock_get),
     )
 
@@ -57,7 +56,7 @@ async def test_retrieve_instrument_metadata_exception(status_code, text_data, si
     instrument_id = uuid4()
     await run_exception_test(
         mocker,
-        "eq_cir_proxy_service.services.instrument.metadata.get_api_client",
+        "eq_cir_proxy_service.services.instrument.retrieve_instrument_metadata.get_api_client",
         retrieve_instrument_metadata,
         instrument_id,
         status_code,
@@ -73,7 +72,7 @@ async def test_retrieve_instrument_metadata_missing_cir_endpoint(mocker):
     instrument_id = uuid4()
     await run_missing_endpoint_test(
         mocker,
-        metadata.retrieve_instrument_metadata,
+        retrieve_instrument_metadata,
         instrument_id,
         {"CIR_API_BASE_URL": "http://fake-url", "CIR_RETRIEVE_CI_METADATA_ENDPOINT": ""},
         "CIR_RETRIEVE_CI_METADATA_ENDPOINT configuration is missing.",
