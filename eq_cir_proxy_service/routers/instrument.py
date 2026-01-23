@@ -40,7 +40,11 @@ async def get_instrument_by_uuid(
 
         instrument_metadata = await metadata.retrieve_instrument_metadata(instrument_id)
 
-        return await conversion.convert_instrument(instrument, instrument_metadata, target_version)
+        return await conversion.convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version=target_version,
+        )
 
     except HTTPException:
         raise  # re-raise so FastAPI handles it properly

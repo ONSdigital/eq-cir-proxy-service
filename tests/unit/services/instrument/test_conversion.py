@@ -88,7 +88,11 @@ async def test_convert_instrument_missing_version(caplog):
     instrument_metadata = {}
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, instrument_metadata, "1.0.0")
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version="1.0.0",
+        )
 
     assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
@@ -103,7 +107,11 @@ async def test_convert_instrument_same_version(caplog):
     caplog.set_level("INFO")
     instrument = {"id": "123", "sections": []}
     instrument_metadata = {"validator_version": "1.0.0"}
-    result = await convert_instrument(instrument, instrument_metadata, "1.0.0")
+    result = await convert_instrument(
+        instrument=instrument,
+        instrument_metadata=instrument_metadata,
+        target_version="1.0.0",
+    )
     assert result == instrument
     assert any(
         record.levelname == "INFO" and "Instrument version matches the target" in record.message
@@ -118,7 +126,11 @@ async def test_convert_instrument_higher_version():
     instrument_metadata = {"validator_version": "2.0.0"}
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, instrument_metadata, "1.0.0")
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version="1.0.0",
+        )
 
     assert excinfo.value.status_code == status.HTTP_400_BAD_REQUEST
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_CONVERSION
@@ -147,7 +159,11 @@ async def test_convert_instrument_lower_version_success(monkeypatch):
     monkeypatch.setenv("CONVERTER_SERVICE_API_BASE_URL", FAKE_API_URL)
     monkeypatch.setenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", FAKE_CONVERT_ENDPOINT)
 
-    result = await convert_instrument(instrument, instrument_metadata, target_version)
+    result = await convert_instrument(
+        instrument=instrument,
+        instrument_metadata=instrument_metadata,
+        target_version=target_version,
+    )
 
     assert result == fake_response_data
 
@@ -168,7 +184,11 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
     monkeypatch.setenv("CONVERTER_SERVICE_IAP_CLIENT_ID", "dummy-client-id")
 
     with pytest.raises(HTTPException) as excinfo:
-        await convert_instrument(instrument, instrument_metadata, target_version)
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version=target_version,
+        )
 
     assert excinfo.value.status_code == 500
     assert excinfo.value.detail["message"] == "Error connecting to Converter Service."
@@ -187,7 +207,11 @@ async def test_retrieve_instrument_missing_converter_endpoint(mocker):
         clear=True,
     )
     with pytest.raises(HTTPException) as exc_info:
-        await convert_instrument(instrument, instrument_metadata, target_version)
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version=target_version,
+        )
     exc = exc_info.value
     assert exc.status_code == 500
     assert exc.detail["message"] == "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing."

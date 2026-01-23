@@ -33,6 +33,7 @@ def safe_parse(source: str, version: str) -> Version:
 
 
 async def convert_instrument(
+    *,
     instrument: Instrument,
     instrument_metadata: InstrumentMetadata,
     target_version: str,
