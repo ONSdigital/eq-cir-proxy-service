@@ -139,7 +139,6 @@ async def test_convert_instrument_missing_version(caplog):
 
     assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
-    print(caplog.records)
     assert any(
         record.levelname == "ERROR" and "Instrument validator_version is missing" in record.message
         for record in caplog.records
