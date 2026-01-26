@@ -34,7 +34,6 @@ async def retrieve_instrument(instrument_id: UUID) -> Instrument:
     check_endpoint_configured(
         endpoint=cir_endpoint,
         endpoint_name="CIR_RETRIEVE_CI_ENDPOINT",
-        endpoint_error_message="CIR_RETRIEVE_CI_ENDPOINT configuration is missing.",
     )
 
     async with get_api_client(

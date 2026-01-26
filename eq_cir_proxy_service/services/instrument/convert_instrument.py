@@ -84,7 +84,6 @@ async def convert_instrument(
         check_endpoint_configured(
             endpoint=converter_service_endpoint,
             endpoint_name="CONVERTER_SERVICE_CONVERT_CI_ENDPOINT",
-            endpoint_error_message="CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing.",
         )
 
         async with get_api_client(
