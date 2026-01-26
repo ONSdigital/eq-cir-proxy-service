@@ -81,11 +81,11 @@ class DummyIAPClient:
 
 
 @pytest.mark.asyncio
-async def test_convert_instrument_missing_version(caplog):
-    """Should raise 404 if validator_version is missing."""
+async def test_convert_instrument_missing_metadata(caplog):
+    """Should raise 404 if instrument metadata is missing."""
     caplog.set_level("INFO")
-    instrument = {"id": "123", "sections": []}  # no validator_version
-    instrument_metadata = {}
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = None
 
     with pytest.raises(HTTPException) as excinfo:
         await convert_instrument(
@@ -97,7 +97,52 @@ async def test_convert_instrument_missing_version(caplog):
     assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
     assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
     assert any(
-        record.levelname == "ERROR" and "Instrument version is missing" in record.message for record in caplog.records
+        record.levelname == "ERROR" and "Instrument metadata is missing" in record.message for record in caplog.records
+    )
+
+
+@pytest.mark.asyncio
+async def test_convert_instrument_metadata_invalid_type(caplog):
+    """Should raise 404 if instrument metadata is not a dictionary."""
+    caplog.set_level("INFO")
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = "metadata"
+
+    with pytest.raises(HTTPException) as excinfo:
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version="1.0.0",
+        )
+
+    assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
+    assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
+    assert any(
+        record.levelname == "ERROR" and "Instrument metadata is not a dictionary" in record.message
+        for record in caplog.records
+    )
+
+
+@pytest.mark.asyncio
+async def test_convert_instrument_missing_version(caplog):
+    """Should raise 404 if validator_version is missing."""
+    caplog.set_level("INFO")
+    instrument = {"id": "123", "sections": []}
+    instrument_metadata = {}  # no validator_version
+
+    with pytest.raises(HTTPException) as excinfo:
+        await convert_instrument(
+            instrument=instrument,
+            instrument_metadata=instrument_metadata,
+            target_version="1.0.0",
+        )
+
+    assert excinfo.value.status_code == status.HTTP_404_NOT_FOUND
+    assert excinfo.value.detail["message"] == exception_messages.EXCEPTION_400_INVALID_INSTRUMENT
+    print(caplog.records)
+    assert any(
+        record.levelname == "ERROR" and "Instrument validator_version is missing" in record.message
+        for record in caplog.records
     )
 
 

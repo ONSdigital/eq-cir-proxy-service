@@ -48,12 +48,20 @@ async def convert_instrument(
     Returns:
     - dict: The converted instrument.
     """
-    if (
-        not instrument_metadata
-        or not isinstance(instrument_metadata, dict)
-        or not instrument_metadata.get("validator_version")
-    ):
-        logger.error("Instrument version is missing")
+    if instrument_metadata is None:
+        logger.error("Instrument metadata is missing")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
+        )
+    if not isinstance(instrument_metadata, dict):
+        logger.error("Instrument metadata is not a dictionary")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
+        )
+    if not instrument_metadata.get("validator_version"):
+        logger.error("Instrument validator_version is missing")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"status": "error", "message": exception_messages.EXCEPTION_400_INVALID_INSTRUMENT},
