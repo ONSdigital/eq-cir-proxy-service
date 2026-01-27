@@ -9,7 +9,6 @@ from structlog import get_logger
 
 from eq_cir_proxy_service.exceptions import exception_messages
 from eq_cir_proxy_service.types.custom_types import Instrument, InstrumentMetadata
-from eq_cir_proxy_service.utils.check_endpoint import check_endpoint_configured
 from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
@@ -80,11 +79,6 @@ async def convert_instrument(
         )
 
         converter_service_endpoint = os.getenv("CONVERTER_SERVICE_CONVERT_CI_ENDPOINT", "/schema")
-
-        check_endpoint_configured(
-            endpoint=converter_service_endpoint,
-            endpoint_name="CONVERTER_SERVICE_CONVERT_CI_ENDPOINT",
-        )
 
         async with get_api_client(
             url_env="CONVERTER_SERVICE_API_BASE_URL",

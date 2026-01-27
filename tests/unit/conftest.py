@@ -115,19 +115,3 @@ async def run_exception_test(
 
     expected_status = status_code if status_code is not None else 500
     assert exc_info.value.status_code == expected_status
-
-
-async def run_missing_endpoint_test(
-    mocker,
-    test_func,
-    instrument_id,
-    env_vars,
-    expected_message,
-):
-    """Shared logic for missing endpoint tests in instrument services."""
-    mocker.patch.dict(os.environ, env_vars, clear=True)
-    with pytest.raises(HTTPException) as exc_info:
-        await test_func(instrument_id)
-    exc = exc_info.value
-    assert exc.status_code == 500
-    assert exc.detail["message"] == expected_message

@@ -13,7 +13,6 @@ from tests.unit.conftest import (
     get_fake_api_client,
     make_mock_response,
     run_exception_test,
-    run_missing_endpoint_test,
 )
 
 
@@ -63,17 +62,4 @@ async def test_retrieve_instrument_metadata_exception(status_code, text_data, si
         text_data,
         side_effect,
         {"CIR_API_BASE_URL": "http://fake-base-url/", "CIR_RETRIEVE_CI_ENDPOINT": "fake-endpoint"},
-    )
-
-
-@pytest.mark.asyncio
-async def test_retrieve_instrument_metadata_missing_cir_endpoint(mocker):
-    """Test missing endpoint configuration in the retrieve_instrument_metadata function."""
-    instrument_id = uuid4()
-    await run_missing_endpoint_test(
-        mocker,
-        retrieve_instrument_metadata,
-        instrument_id,
-        {"CIR_API_BASE_URL": "http://fake-url", "CIR_RETRIEVE_CI_METADATA_ENDPOINT": ""},
-        "CIR_RETRIEVE_CI_METADATA_ENDPOINT configuration is missing.",
     )

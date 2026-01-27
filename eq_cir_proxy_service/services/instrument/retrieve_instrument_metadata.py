@@ -12,7 +12,6 @@ from eq_cir_proxy_service.exceptions.exception_messages import (
     EXCEPTION_500_INSTRUMENT_METADATA_PROCESSING,
 )
 from eq_cir_proxy_service.types.custom_types import InstrumentMetadata
-from eq_cir_proxy_service.utils.check_endpoint import check_endpoint_configured
 from eq_cir_proxy_service.utils.iap import get_api_client
 
 logger = get_logger()
@@ -30,11 +29,6 @@ async def retrieve_instrument_metadata(instrument_id: UUID) -> InstrumentMetadat
     logger.debug("Retrieving instrument metadata from CIR...", instrument_id=instrument_id)
 
     cir_endpoint = os.getenv("CIR_RETRIEVE_CI_METADATA_ENDPOINT", "/v3/ci-metadata")
-
-    check_endpoint_configured(
-        endpoint=cir_endpoint,
-        endpoint_name="CIR_RETRIEVE_CI_METADATA_ENDPOINT",
-    )
 
     async with get_api_client(
         url_env="CIR_API_BASE_URL",

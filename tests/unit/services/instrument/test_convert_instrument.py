@@ -1,6 +1,5 @@
 """Unit tests for the instrument conversion service."""
 
-import os
 from dataclasses import dataclass
 
 import pytest
@@ -22,6 +21,7 @@ class DummyResponse:
     """Dummy response for testing."""
 
     json_data: dict
+    status_code: int = 200  # Default to 200, can be overridden in tests
 
     def raise_for_status(self):
         """Simulate raise_for_status (no-op for testing)."""
@@ -197,29 +197,6 @@ async def test_convert_instrument_request_error_with_iap(monkeypatch):
 
     assert excinfo.value.status_code == 500
     assert excinfo.value.detail["message"] == "Error connecting to Converter Service."
-
-
-@pytest.mark.asyncio
-async def test_retrieve_instrument_missing_converter_endpoint(mocker):
-    """Test convert_instrument raises HTTPException if CONVERTER_SERVICE_CONVERT_CI_ENDPOINT exists but has no value."""
-    instrument = {"id": "123", "sections": []}
-    instrument_metadata = {"validator_version": "1.0.0"}
-    target_version = "2.0.0"
-    # Patch environment to include CONVERTER_SERVICE_API_BASE_URL but not CONVERTER_SERVICE_CONVERT_CI_ENDPOINT
-    mocker.patch.dict(
-        os.environ,
-        {"CONVERTER_SERVICE_API_BASE_URL": "http://fake-url", "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT": ""},
-        clear=True,
-    )
-    with pytest.raises(HTTPException) as exc_info:
-        await convert_instrument(
-            instrument=instrument,
-            instrument_metadata=instrument_metadata,
-            target_version=target_version,
-        )
-    exc = exc_info.value
-    assert exc.status_code == 500
-    assert exc.detail["message"] == "CONVERTER_SERVICE_CONVERT_CI_ENDPOINT configuration is missing."
 
 
 def test_safe_parse_valid(monkeypatch):
