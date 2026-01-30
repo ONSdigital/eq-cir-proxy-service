@@ -28,7 +28,7 @@ async def retrieve_instrument_metadata(instrument_id: UUID) -> InstrumentMetadat
     """
     logger.debug("Retrieving instrument metadata from CIR...", instrument_id=instrument_id)
 
-    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_METADATA_ENDPOINT", "/v3/ci-metadata")
+    cir_endpoint = os.getenv("CIR_RETRIEVE_CI_METADATA_ENDPOINT", "/v3/ci_metadata")
 
     async with get_api_client(
         url_env="CIR_API_BASE_URL",
